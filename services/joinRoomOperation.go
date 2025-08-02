@@ -8,7 +8,7 @@ import (
 )
 
 type joinRoomOperation struct {
-	roomId int `json:"roomId"`
+	RoomId int `json:"roomId"`
 }
 
 func handleJoinRoomOperation(client Client, message JSONMessage) (bool, error) {
@@ -24,7 +24,7 @@ func handleJoinRoomOperation(client Client, message JSONMessage) (bool, error) {
 		return false, fmt.Errorf("client doesn't have user attached")
 	}
 
-	room := db.GetRoomById(data.roomId)
+	room := db.GetRoomById(data.RoomId)
 
 	if room == nil {
 		return false, fmt.Errorf("room doesn't exist")

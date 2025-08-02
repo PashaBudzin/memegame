@@ -97,3 +97,7 @@ func (u *User) LeaveRoom() error {
 
 	return nil
 }
+
+func (u *User) GetCurrentRoomId() int {
+	return *u.current_room_id
+}

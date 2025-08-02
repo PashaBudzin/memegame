@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/PashaBudzin/memegame/db"
 	"github.com/gorilla/websocket"
@@ -34,4 +35,14 @@ func (c *Client) SendMessage(message JSONMessage) (bool, error) {
 
 func (c *Client) SendOk() (bool, error) {
 	return c.SendMessage(JSONMessage{Type: "ok", Data: nil})
+}
+
+func (c *Client) SendError(message string) (bool, error) {
+	msg, err := json.Marshal(message)
+
+	if err != nil {
+		return false, fmt.Errorf("failed to marshal error message")
+	}
+
+	return c.SendMessage(JSONMessage{Type: "error", Data: msg})
 }

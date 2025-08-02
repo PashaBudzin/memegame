@@ -13,6 +13,10 @@ func HandleMessage(client Client, message JSONMessage) (bool, error) {
 
 	case "join-room":
 		return handleJoinRoomOperation(client, message)
+
+	case "leave-room":
+		return handleLeaveRoomOpeartion(client, message)
+
 	}
 
 	return false, nil

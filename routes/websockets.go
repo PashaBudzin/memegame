@@ -75,14 +75,9 @@ func HandleWebsockets(w http.ResponseWriter, r *http.Request) {
 		_, err = services.HandleMessage(*client, msg)
 
 		if err != nil {
-			reply := services.JSONMessage{
-				Type: "error",
-				Data: msg.Data,
-			}
-
-			if _, err := client.SendMessage(reply); err != nil {
-				log.Printf("Write error [%s]: %v", clientID, err)
-				break
+			log.Printf("error %v", err)
+			if _, err = client.SendError(err.Error()); err != nil {
+				log.Printf("failed to send error")
 			}
 		}
 	}
