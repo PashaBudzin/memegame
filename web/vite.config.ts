@@ -30,9 +30,8 @@ export default defineConfig({
                 secure: false,
             },
             "/ws": {
-                target: "http://localhost:8080/ws",
-                changeOrigin: true,
-                secure: false,
+                target: "ws://localhost:8080/ws",
+                rewriteWsOrigin: true,
                 ws: true,
             },
         },

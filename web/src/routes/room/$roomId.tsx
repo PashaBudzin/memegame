@@ -1,12 +1,19 @@
 import Chat from "@/components/chat";
+import { useWebsocketService } from "@/stores/websockets";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/room/$roomId")({
     component: Room,
 });
 
 function Room() {
-    // const { roomId } = Route.useParams();
+    const wss = useWebsocketService();
+
+    useEffect(() => {
+        wss.handleOperationType("pong", _ => console.log("pong"))
+        wss.sendMessage("ping", null);
+    }, []);
 
     return (
         <div className="glass absolute inset-0 m-20 mx-5 grid grid-cols-8 justify-center lg:mx-40">

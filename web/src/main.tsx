@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
@@ -7,6 +6,7 @@ import { routeTree } from "./routeTree.gen";
 
 import "./styles.css";
 import reportWebVitals from "./reportWebVitals.ts";
+import { Provider as JotaiProvider } from "jotai";
 
 // Create a new router instance
 const router = createRouter({
@@ -30,9 +30,9 @@ const rootElement = document.getElementById("app");
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
-        <StrictMode>
+        <JotaiProvider>
             <RouterProvider router={router} />
-        </StrictMode>,
+        </JotaiProvider>,
     );
 }
 
