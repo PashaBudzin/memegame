@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/PashaBudzin/memegame/routes"
 	"github.com/gorilla/mux"
 )
 
@@ -21,6 +22,8 @@ func main() {
 	apiSubrouter.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hello, world"))
 	}).Methods("GET")
+
+	r.HandleFunc("/ws", routes.HandleWebsockets)
 
 	staticDir := http.StripPrefix("/", http.FileServer(http.Dir(STATIC_DIR)))
 	r.PathPrefix("/").Handler(staticDir)
