@@ -58,14 +58,14 @@ func (u *User) JoinRoom(roomId int) error {
 	return nil
 }
 
-func (u *User) LeaveRoom(roomId int) error {
+func (u *User) LeaveRoom() error {
 	u.userMutex.Lock()
 	defer u.userMutex.Unlock()
 
-	room := GetRoomById(roomId)
+	room := GetRoomById(*u.current_room_id)
 
 	if room == nil {
-		return fmt.Errorf("no such room with id %d", roomId)
+		return fmt.Errorf("user's room doesn't exist")
 	}
 
 	room.RoomMutex.Lock()

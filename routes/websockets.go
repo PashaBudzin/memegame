@@ -37,6 +37,10 @@ func HandleWebsockets(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		conn.Close()
 		delete(clients, clientID)
+
+		if client.User != nil {
+			client.User.LeaveRoom()
+		}
 		log.Printf("connection with id %s disconnected", clientID)
 	}()
 

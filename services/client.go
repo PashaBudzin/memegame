@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 
+	"github.com/PashaBudzin/memegame/db"
 	"github.com/gorilla/websocket"
 )
 
@@ -14,6 +15,7 @@ type JSONMessage struct {
 type Client struct {
 	ID   string
 	Conn *websocket.Conn
+	User *db.User
 }
 
 func (c *Client) SendMessage(message JSONMessage) (bool, error) {
@@ -28,4 +30,8 @@ func (c *Client) SendMessage(message JSONMessage) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (c *Client) SendOk() (bool, error) {
+	return c.SendMessage(JSONMessage{Type: "ok", Data: nil})
 }
