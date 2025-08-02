@@ -51,7 +51,7 @@ export const Shape = () => {
         "hsl(240,100%,70%)",
         "hsl(160,100%,70%)",
         "hsl(80,100%,70%)",
-    ].map(el => shiftHslHue(el, hashStringToNumber(location.href)));
+    ].map((el) => shiftHslHue(el, hashStringToNumber(location.href)));
 
     return (
         <svg

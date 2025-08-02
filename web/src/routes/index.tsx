@@ -6,8 +6,9 @@ export const Route = createFileRoute("/")({
 
 function App() {
     return (
-        <div>
-            <h1></h1>
+        <div className="glass absolute inset-0 m-20 mx-40">
+            <h1>hello, world!</h1>
+            <button className="glass glass-btn p-1">CLICK ME</button>
         </div>
     );
 }

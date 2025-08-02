@@ -5,9 +5,11 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 export const Route = createRootRoute({
     component: () => (
         <>
-            <Outlet />
-            <Background />
             <TanStackRouterDevtools />
+            <Background />
+            <main className="absolute inset-0 z-20 ">
+                <Outlet />
+            </main>
         </>
     ),
 });
