@@ -78,7 +78,7 @@ export const Background = () => {
 
     return (
         <div
-            className={`relative h-screen w-screen overflow-hidden`}
+            className={`relative h-screen w-screen overflow-hidden transition-all`}
             style={{ backgroundColor: bg }}
         >
             {/* Overlay gradient */}

@@ -47,7 +47,16 @@ code {
 }
 
 .glass-btn:active {
-    background: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.glass-btn:disabled {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.glass-input:focus {
+    background: rgba(255, 255, 255, 0);
+    border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 body {
@@ -61,4 +70,8 @@ body {
     overflow: hidden;
     height: 100%;
     width: 100%;
+}
+
+input:focus {
+    outline: none;
 }
