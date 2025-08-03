@@ -22,7 +22,7 @@ function shiftHslHue(hsl: string, shift: number): string {
     const match = hsl.match(/hsl\(\s*(\d+),\s*([\d.]+)%?,\s*([\d.]+)%?\s*\)/i);
     if (!match) throw new Error("Invalid HSL format");
 
-    let [_, h, s, l] = match;
+    const [_, h, s, l] = match;
     const hue = (parseInt(h) + shift) % 360;
     const sat = parseFloat(s);
     const light = parseFloat(l);

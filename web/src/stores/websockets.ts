@@ -1,5 +1,5 @@
-import { WebsocketService } from "@/lib/websocket-service";
 import { atom, useAtom } from "jotai";
+import { WebsocketService } from "@/lib/websocket-service";
 
 export const websocketAtom = atom(async () => await WebsocketService.create());
 

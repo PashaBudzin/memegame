@@ -1,6 +1,6 @@
-import { Background } from "@/components/background";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { Background } from "@/components/background";
 
 export const Route = createRootRoute({
     component: () => (

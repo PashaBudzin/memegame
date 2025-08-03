@@ -1,6 +1,6 @@
-import Avatar from "@/components/avatar";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import Avatar from "@/components/avatar";
 
 export const Route = createFileRoute("/")({
     component: App,

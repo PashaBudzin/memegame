@@ -42,11 +42,11 @@ export class WebsocketService {
                 typeof data === "object" &&
                 data != null &&
                 "type" in data &&
-                typeof data?.type === "string" &&
+                typeof data.type === "string" &&
                 "data" in data &&
                 data.type == type
             ) {
-                callback(data.data as unknown)
+                callback(data.data);
                 return;
             }
             console.error("data isn't of correct format", data);

@@ -1,7 +1,7 @@
-import Chat from "@/components/chat";
-import { useWebsocketService } from "@/stores/websockets";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
+import Chat from "@/components/chat";
+import { useWebsocketService } from "@/stores/websockets";
 
 export const Route = createFileRoute("/room/$roomId")({
     component: Room,
