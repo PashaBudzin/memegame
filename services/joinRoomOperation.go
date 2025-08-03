@@ -8,7 +8,7 @@ import (
 )
 
 type joinRoomOperation struct {
-	RoomId int `json:"roomId"`
+	RoomId string `json:"roomId"`
 }
 
 func handleJoinRoomOperation(client Client, message JSONMessage) (bool, error) {

@@ -3,22 +3,23 @@ package db
 import (
 	"fmt"
 	"sync"
+
+	"github.com/google/uuid"
 )
 
 type Room struct {
-	id        int
+	id        string
 	Users     []*User
 	Owner_id  int
-	RoomMutex sync.Mutex
+	roomMutex sync.Mutex
 }
 
 var (
-	rooms        = make(map[int]*Room)
-	roomsMutex   sync.Mutex
-	latestRoomId = 1
+	rooms      = make(map[string]*Room)
+	roomsMutex sync.Mutex
 )
 
-func (r *Room) GetId() int {
+func (r *Room) GetId() string {
 	return r.id
 }
 
@@ -27,7 +28,9 @@ func (r *Room) Delete() (bool, error) {
 	defer roomsMutex.Unlock()
 
 	for _, u := range r.Users {
+		u.userMutex.Lock()
 		u.current_room_id = nil
+		u.userMutex.Unlock()
 	}
 
 	delete(rooms, r.id)
@@ -36,29 +39,25 @@ func (r *Room) Delete() (bool, error) {
 }
 
 func CreateRoom(owner *User) *Room {
-	room := Room{latestRoomId, []*User{owner}, owner.id, sync.Mutex{}}
-
 	roomsMutex.Lock()
+	room := Room{uuid.New().String(), []*User{owner}, owner.id, sync.Mutex{}}
 
-	rooms[latestRoomId] = &room
+	rooms[room.id] = &room
 
-	latestRoomId += 1
+	owner.current_room_id = &room.id
 
 	roomsMutex.Unlock()
 
 	return &room
 }
 
-func GetRoomById(id int) *Room {
+func GetRoomById(id string) *Room {
 	roomsMutex.Lock()
 	defer roomsMutex.Unlock()
 	return rooms[id]
 }
 
 func (r *Room) TransferRoomOwnership(userId int) (bool, error) {
-	r.RoomMutex.Lock()
-	defer roomsMutex.Unlock()
-
 	for _, u := range r.Users {
 		if u.id == userId {
 			r.Owner_id = userId

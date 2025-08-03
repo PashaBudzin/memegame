@@ -8,7 +8,7 @@ import (
 type User struct {
 	id              int
 	Name            string
-	current_room_id *int
+	current_room_id *string
 	userMutex       sync.Mutex
 }
 
@@ -31,23 +31,23 @@ func CreateUser(name string) *User {
 	return &user
 }
 
-func (u *User) JoinRoom(roomId int) error {
+func (u *User) JoinRoom(roomId string) error {
 	u.userMutex.Lock()
 	defer u.userMutex.Unlock()
 
 	room := GetRoomById(roomId)
 
 	if room == nil {
-		return fmt.Errorf("no such room with id %d", roomId)
+		return fmt.Errorf("no such room with id %s", roomId)
 	}
 
-	room.RoomMutex.Lock()
+	room.roomMutex.Lock()
 
-	defer room.RoomMutex.Unlock()
+	defer room.roomMutex.Unlock()
 
 	for _, user := range room.Users {
 		if user.id == u.id {
-			return fmt.Errorf("user with id %d is already in room %d", u.id, room.GetId())
+			return fmt.Errorf("user with id %d is already in room %s", u.id, room.GetId())
 		}
 	}
 
@@ -68,17 +68,9 @@ func (u *User) LeaveRoom() error {
 		return fmt.Errorf("user's room doesn't exist")
 	}
 
-	room.RoomMutex.Lock()
+	room.roomMutex.Lock()
 
-	defer room.RoomMutex.Unlock()
-
-	u.current_room_id = nil
-
-	if len(room.Users) <= 1 {
-		room.Delete()
-
-		return nil
-	}
+	defer room.roomMutex.Unlock()
 
 	for i, user := range room.Users {
 		if u.id == user.id {
@@ -86,6 +78,15 @@ func (u *User) LeaveRoom() error {
 			break
 		}
 	}
+
+	if len(room.Users) == 0 {
+		room.Delete()
+		u.current_room_id = nil
+
+		return nil
+	}
+
+	u.current_room_id = nil
 
 	any_user := room.Users[0]
 
@@ -98,6 +99,12 @@ func (u *User) LeaveRoom() error {
 	return nil
 }
 
-func (u *User) GetCurrentRoomId() int {
-	return *u.current_room_id
+func (u *User) CurrentRoom() *Room {
+	room, ok := rooms[*u.current_room_id]
+
+	if !ok {
+		panic("user doesn't belong to room, but current_room_id isn't nil")
+	}
+
+	return room
 }
