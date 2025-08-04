@@ -10,7 +10,7 @@ import (
 type Room struct {
 	id        string
 	Users     []*User
-	Owner_id  int
+	Owner_id  string
 	roomMutex sync.Mutex
 }
 
@@ -57,7 +57,7 @@ func GetRoomById(id string) *Room {
 	return rooms[id]
 }
 
-func (r *Room) TransferRoomOwnership(userId int) (bool, error) {
+func (r *Room) TransferRoomOwnership(userId string) (bool, error) {
 	for _, u := range r.Users {
 		if u.id == userId {
 			r.Owner_id = userId
@@ -66,5 +66,5 @@ func (r *Room) TransferRoomOwnership(userId int) (bool, error) {
 		}
 	}
 
-	return false, fmt.Errorf("no such user with id %d", userId)
+	return false, fmt.Errorf("no such user with id %s", userId)
 }

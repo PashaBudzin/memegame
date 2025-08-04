@@ -3,10 +3,12 @@ package db
 import (
 	"fmt"
 	"sync"
+
+	"github.com/google/uuid"
 )
 
 type User struct {
-	id              int
+	id              string
 	Name            string
 	current_room_id *string
 	userMutex       sync.Mutex
@@ -17,13 +19,13 @@ var (
 	latestUserId = 1
 )
 
-func (u *User) GetId() int {
+func (u *User) GetId() string {
 	return u.id
 }
 
 func CreateUser(name string) *User {
 	usersMutex.Lock()
-	user := User{Name: name, id: latestUserId}
+	user := User{Name: name, id: uuid.NewString()}
 
 	latestUserId += 1
 
@@ -47,7 +49,7 @@ func (u *User) JoinRoom(roomId string) error {
 
 	for _, user := range room.Users {
 		if user.id == u.id {
-			return fmt.Errorf("user with id %d is already in room %s", u.id, room.GetId())
+			return fmt.Errorf("user with id %s is already in room %s", u.id, room.GetId())
 		}
 	}
 
