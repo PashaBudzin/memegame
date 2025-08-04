@@ -11,6 +11,7 @@ type User struct {
 	id              string
 	Name            string
 	current_room_id *string
+	client_id       string
 	userMutex       sync.Mutex
 }
 
@@ -23,9 +24,9 @@ func (u *User) GetId() string {
 	return u.id
 }
 
-func CreateUser(name string) *User {
+func CreateUser(name string, client_id string) *User {
 	usersMutex.Lock()
-	user := User{Name: name, id: uuid.NewString()}
+	user := User{Name: name, id: uuid.NewString(), client_id: client_id}
 
 	latestUserId += 1
 
@@ -109,4 +110,14 @@ func (u *User) CurrentRoom() *Room {
 	}
 
 	return room
+}
+
+func (u *User) GetClient() *Client {
+	client := GetClientById(u.client_id)
+
+	if client == nil {
+		panic("no client attached")
+	}
+
+	return client
 }

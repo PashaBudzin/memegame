@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/PashaBudzin/memegame/db"
 	"github.com/PashaBudzin/memegame/services"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -16,7 +17,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var clients = make(map[string]*services.Client)
+var clients = make(map[string]*db.Client)
 
 func HandleWebsockets(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -27,7 +28,7 @@ func HandleWebsockets(w http.ResponseWriter, r *http.Request) {
 	}
 
 	clientID := uuid.New().String()
-	client := &services.Client{
+	client := &db.Client{
 		ID:   clientID,
 		Conn: conn,
 	}
@@ -54,12 +55,12 @@ func HandleWebsockets(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("recieved [%s]: %s", clientID, message)
 
-		var msg services.JSONMessage
+		var msg db.JSONMessage
 
 		if err := json.Unmarshal(message, &msg); err != nil {
 			log.Printf("invalid JSON [%s] %s", clientID, message)
 
-			reply := services.JSONMessage{
+			reply := db.JSONMessage{
 				Type: "error",
 				Data: []byte("invalid JSON"),
 			}

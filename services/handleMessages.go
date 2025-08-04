@@ -1,13 +1,17 @@
 package services
 
-import "log"
+import (
+	"log"
 
-func HandleMessage(client Client, message JSONMessage) (bool, error) {
+	"github.com/PashaBudzin/memegame/db"
+)
+
+func HandleMessage(client db.Client, message db.JSONMessage) (bool, error) {
 	log.Printf("handling operation with type %s from user %s", message.Type, client.ID)
 
 	switch message.Type {
 	case "ping":
-		client.SendMessage(JSONMessage{Type: "pong", Data: nil})
+		client.SendMessage(db.JSONMessage{Type: "pong", Data: nil})
 		return true, nil
 
 	case "attach-user":

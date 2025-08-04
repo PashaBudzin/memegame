@@ -68,3 +68,19 @@ func (r *Room) TransferRoomOwnership(userId string) (bool, error) {
 
 	return false, fmt.Errorf("no such user with id %s", userId)
 }
+
+func (r *Room) BroadcastMessage(message JSONMessage, from_id *string) (bool, error) {
+	r.roomMutex.Lock()
+	defer r.roomMutex.Unlock()
+
+	for _, user := range r.Users {
+		if from_id == nil || *from_id == user.GetId() {
+			continue
+		}
+
+		user.GetClient().SendMessage(message)
+	}
+
+	return true, nil
+
+}

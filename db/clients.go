@@ -1,10 +1,11 @@
-package services
+package db
 
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 
-	"github.com/PashaBudzin/memegame/db"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -16,7 +17,27 @@ type JSONMessage struct {
 type Client struct {
 	ID   string
 	Conn *websocket.Conn
-	User *db.User
+	User *User
+}
+
+var (
+	clientsMutex sync.Mutex
+	clients      = make(map[string]*Client)
+)
+
+func NewClient(conn *websocket.Conn) *Client {
+	clientsMutex.Lock()
+	defer clientsMutex.Unlock()
+
+	client := &Client{
+		ID:   uuid.NewString(),
+		Conn: conn,
+		User: nil,
+	}
+
+	clients[client.ID] = client
+
+	return client
 }
 
 func (c *Client) SendMessage(message JSONMessage) (bool, error) {
@@ -45,4 +66,23 @@ func (c *Client) SendError(message string) (bool, error) {
 	}
 
 	return c.SendMessage(JSONMessage{Type: "error", Data: msg})
+}
+
+func (c *Client) AttachNewUser(name string) *User {
+	user := CreateUser(name, c.ID)
+	c.User = user
+
+	return user
+}
+
+func GetClientById(id string) *Client {
+	clientsMutex.Lock()
+	defer clientsMutex.Unlock()
+
+	client, exists := clients[id]
+	if !exists {
+		return nil
+	}
+
+	return client
 }
