@@ -7,6 +7,17 @@ const messageSchema = z.object({
     data: z.any().nullish(),
 });
 
+const roomSchema = z.object({
+    ownerId: z.string(),
+    roomId: z.string(),
+    users: z.array(
+        z.object({
+            id: z.string(),
+            name: z.string(),
+        }),
+    ),
+});
+
 export class WebsocketService {
     private ws: WebSocket;
     private static instance: WebsocketService | null = null;
@@ -104,9 +115,11 @@ export class WebsocketService {
 
         const result = await this.waitForResult("create-room");
 
-        const resultSchema = z.string().nullable();
+        const parsedResult = roomSchema.parse(result);
 
-        return resultSchema.parse(result);
+        setRoom(parsedResult.ownerId, parsedResult.roomId, parsedResult.users);
+
+        return parsedResult;
     }
 
     async me() {
@@ -132,18 +145,7 @@ export class WebsocketService {
 
         console.log(result);
 
-        const resultSchema = z.object({
-            ownerId: z.string(),
-            roomId: z.string(),
-            users: z.array(
-                z.object({
-                    id: z.string(),
-                    name: z.string(),
-                }),
-            ),
-        });
-
-        const parsedResult = resultSchema.parse(result);
+        const parsedResult = roomSchema.parse(result);
 
         setRoom(parsedResult.ownerId, parsedResult.roomId, parsedResult.users);
 

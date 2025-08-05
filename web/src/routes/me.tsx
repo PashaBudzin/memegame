@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { Play } from "lucide-react";
 import { WebsocketService } from "@/lib/websocket-service";
 import Avatar from "@/components/avatar";
@@ -24,11 +24,20 @@ function Me() {
 
     const wss = useWebsocketService();
 
+    const navigate = useNavigate({ from: "/me" });
+
     async function createRoom() {
         try {
             const roomId = await wss.createRoom();
 
-            console.log(`created room with id: ${roomId}`);
+            if (!roomId) {
+                throw new Error("Failed to create room");
+            }
+
+            await navigate({
+                to: "/room/$roomId",
+                params: { roomId },
+            });
         } catch (err) {
             console.error(err);
         }

@@ -41,37 +41,7 @@ func handleJoinRoomOperation(client *db.Client, message db.JSONMessage) (bool, e
 
 	userId := client.User.GetId()
 
-	type User struct {
-		Id   string `json:"id"`
-		Name string `json:"name"`
-	}
-
-	type Room struct {
-		RoomId  string `json:"roomId"`
-		Users   []User `json:"users"`
-		OwnerId string `json:"ownerId"`
-	}
-
-	roomUsers := make([]User, len(room.Users))
-
-	room.LockMutex()
-
-	for i, user := range room.Users {
-		roomUsers[i] = User{
-			Id:   user.GetId(),
-			Name: user.Name,
-		}
-	}
-
-	room.UnlockMutex()
-
-	roomData := Room{
-		RoomId:  room.GetId(),
-		Users:   roomUsers,
-		OwnerId: client.User.CurrentRoom().Owner_id,
-	}
-
-	jsonBytes, err := json.Marshal(roomData)
+	roomData, jsonBytes, err := client.User.CurrentRoom().RoomToJson()
 
 	room.BroadcastMessage(db.JSONMessage{
 		Type: "user-joined",

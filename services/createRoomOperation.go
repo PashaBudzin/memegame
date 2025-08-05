@@ -18,7 +18,14 @@ func handleCreateRoomOperation(client *db.Client, _ db.JSONMessage) (bool, error
 		return false, fmt.Errorf("no user attached")
 	}
 
-	client.SendOk("create-room", room.GetId())
+	roomData, _, err := room.RoomToJson()
+
+	if err != nil {
+		client.SendError("create-room", err.Error())
+		return false, err
+	}
+
+	client.SendOk("create-room", roomData)
 
 	return true, nil
 }
