@@ -123,4 +123,22 @@ export class WebsocketService {
 
         return resultSchema.parse(result);
     }
+
+    async joinRoom(roomId: string) {
+        this.sendMessage("join-room", { roomId });
+
+        const result = this.waitForResult("join-room");
+
+        return result;
+    }
+}
+
+declare global {
+    interface Window {
+        wss?: WebsocketService;
+    }
+}
+
+if (import.meta.env.DEV) {
+    window.wss = await WebsocketService.create();
 }
