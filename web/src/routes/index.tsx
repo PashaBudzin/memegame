@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import Avatar from "@/components/avatar";
 import { useWebsocketService } from "@/stores/websockets";
@@ -9,19 +9,22 @@ export const Route = createFileRoute("/")({
 
 function App() {
     const [name, setName] = useState("");
+    const navigate = useNavigate();
 
     const wss = useWebsocketService();
 
-    const handleCreateRoom = (userName: string) => {
+    const handleCreateRoom = async (userName: string) => {
         if (userName.length < 1) {
             return;
         }
 
-        wss.attachUser(userName)
-            .then((ok) => {
-                console.log("User was attached");
-            })
-            .catch((err) => console.error(err));
+        try {
+            await wss.attachUser(userName);
+
+            await navigate({ to: "/me" });
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (

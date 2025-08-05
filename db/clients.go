@@ -57,8 +57,17 @@ func (c *Client) SendMessage(message JSONMessage) (bool, error) {
 	return true, nil
 }
 
-func (c *Client) SendOk(reason string) (bool, error) {
-	return c.SendMessage(JSONMessage{Type: "ok-" + reason, Data: nil})
+func (c *Client) SendOk(reason string, data any) (bool, error) {
+	messageBytes, err := json.Marshal(data)
+
+	if err != nil {
+		c.SendError(reason, "failed to marshal data for ok message")
+		log.Printf("failed to marshal data for ok message for client %s: %v", c.ID, err)
+
+		return false, fmt.Errorf("failed to marshal data for ok message")
+	}
+
+	return c.SendMessage(JSONMessage{Type: "ok-" + reason, Data: json.RawMessage(messageBytes)})
 }
 
 func (c *Client) SendError(reason string, message string) (bool, error) {

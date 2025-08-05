@@ -8,12 +8,15 @@ const messageSchema = z.object({
 
 export class WebsocketService {
     private ws: WebSocket;
+    private static instance: WebsocketService | null = null;
 
     private constructor(wsUrl: string) {
         this.ws = new WebSocket(wsUrl);
     }
 
     static async create(): Promise<WebsocketService> {
+        if (this.instance) return this.instance;
+
         const service = new WebsocketService(config.wsUrl);
         await new Promise<void>((resolve, reject) => {
             service.ws.addEventListener("open", () => {
@@ -25,6 +28,8 @@ export class WebsocketService {
                 reject(err);
             });
         });
+
+        this.instance = service;
 
         return service;
     }
@@ -62,24 +67,26 @@ export class WebsocketService {
         };
     }
 
-    async waitForResult(type: string, timeout = 5000): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            setTimeout(() => reject("request timed out"), timeout);
+    async waitForResult(type: string, timeoutMs = 5000) {
+        return new Promise<unknown>((resolve, reject) => {
+            setTimeout(() => reject("request timed out"), timeoutMs);
 
             const removeErrorListener = this.handleOperationType(
                 `error-${type}`,
                 (data: unknown) => {
                     console.error(`Recieved error for type ${type}`, data);
                     removeErrorListener();
+                    removeOkListener();
                     reject(data);
                 },
             );
 
             const removeOkListener = this.handleOperationType(
                 `ok-${type}`,
-                (_) => {
+                (data: unknown) => {
                     removeOkListener();
-                    resolve();
+                    removeErrorListener();
+                    resolve(data);
                 },
             );
         });
@@ -89,5 +96,27 @@ export class WebsocketService {
         this.sendMessage("attach-user", { name });
 
         await this.waitForResult("create-user");
+    }
+
+    async createRoom() {
+        this.sendMessage("create-room", null);
+
+        await this.waitForResult("create-room");
+    }
+
+    async me() {
+        this.sendMessage("me", null);
+
+        const result = await this.waitForResult("me");
+
+        const resultSchema = z
+            .object({
+                id: z.string(),
+                name: z.string(),
+                roomId: z.string().nullable(),
+            })
+            .nullable();
+
+        return resultSchema.parse(result);
     }
 }

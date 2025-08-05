@@ -36,7 +36,7 @@ func handleJoinRoomOperation(client *db.Client, message db.JSONMessage) (bool, e
 		return false, err
 	}
 
-	client.SendOk("join-room")
+	client.SendOk("join-room", nil)
 
 	return true, nil
 }

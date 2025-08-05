@@ -17,8 +17,14 @@ func HandleMessage(client *db.Client, message db.JSONMessage) (bool, error) {
 	case "attach-user":
 		return handleAttachUserOperation(client, message)
 
+	case "create-room":
+		return handleCreateRoomOperation(client, message)
+
 	case "join-room":
 		return handleJoinRoomOperation(client, message)
+
+	case "me":
+		return handleMeOperation(client, message)
 
 	case "leave-room":
 		return handleLeaveRoomOpeartion(client, message)

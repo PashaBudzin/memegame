@@ -1,8 +1,9 @@
 package db_test
 
 import (
-	"github.com/PashaBudzin/memegame/db"
 	"testing"
+
+	"github.com/PashaBudzin/memegame/db"
 )
 
 func TestUser_LeaveRoom(t *testing.T) {
@@ -37,5 +38,16 @@ func TestUser_LeaveRoom(t *testing.T) {
 		if db.GetRoomById(roomId) == nil {
 			t.Errorf("room was deleted")
 		}
+	})
+}
+
+func TestUser_CurrentRoom(t *testing.T) {
+	t.Run("returns nil pointer if no room", func(t *testing.T) {
+		user := db.CreateUser("test_user", "1")
+
+		if user.CurrentRoom() != nil {
+			t.Errorf("expected nil pointer for user without room")
+		}
+
 	})
 }

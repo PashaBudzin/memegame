@@ -28,7 +28,7 @@ func handleAttachUserOperation(client *db.Client, message db.JSONMessage) (bool,
 		return false, fmt.Errorf("failed to attach user")
 	}
 
-	client.SendOk("create-user")
+	client.SendOk("create-user", nil)
 
 	return true, nil
 }

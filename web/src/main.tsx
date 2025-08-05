@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { Provider as JotaiProvider } from "jotai";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -25,14 +26,19 @@ declare module "@tanstack/react-router" {
     }
 }
 
+const queryClient = new QueryClient({});
+
 // Render the app
 const rootElement = document.getElementById("app");
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
-        <JotaiProvider>
-            <RouterProvider router={router} />
-        </JotaiProvider>,
+        <QueryClientProvider client={queryClient}>
+            <JotaiProvider>
+                <RouterProvider router={router} />
+            </JotaiProvider>
+            ,
+        </QueryClientProvider>,
     );
 }
 

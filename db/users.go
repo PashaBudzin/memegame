@@ -103,6 +103,10 @@ func (u *User) LeaveRoom() error {
 }
 
 func (u *User) CurrentRoom() *Room {
+	if u.current_room_id == nil {
+		return nil
+	}
+
 	room, ok := rooms[*u.current_room_id]
 
 	if !ok {
