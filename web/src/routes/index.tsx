@@ -1,15 +1,23 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import z from "zod";
 import Avatar from "@/components/avatar";
 import { useWebsocketService } from "@/stores/websockets";
 
+const searchParamsSchema = z.object({
+    roomId: z.uuid().optional(),
+});
+
 export const Route = createFileRoute("/")({
+    validateSearch: (search) => searchParamsSchema.parse(search),
     component: App,
 });
 
 function App() {
     const [name, setName] = useState("");
     const navigate = useNavigate();
+
+    const search = Route.useSearch();
 
     const wss = useWebsocketService();
 
@@ -21,7 +29,16 @@ function App() {
         try {
             await wss.attachUser(userName);
 
-            await navigate({ to: "/me" });
+            if (!search.roomId) return await navigate({ to: "/me" });
+
+            const result = await wss.joinRoom(search.roomId);
+
+            if (result) {
+                await navigate({
+                    to: "/room/$roomId",
+                    params: { roomId: search.roomId },
+                });
+            }
         } catch (err) {
             console.error(err);
         }
@@ -49,7 +66,7 @@ function App() {
                         disabled={!name}
                         onClick={() => handleCreateRoom(name)}
                     >
-                        Create room
+                        {search.roomId ? "Join room" : "Continue"}
                     </button>
                 </div>
             </div>
