@@ -8,6 +8,7 @@ import { routeTree } from "./routeTree.gen";
 
 import "./styles.css";
 import reportWebVitals from "./reportWebVitals.ts";
+import { roomStore } from "./stores/store.ts";
 
 // Create a new router instance
 const router = createRouter({
@@ -34,7 +35,7 @@ if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
         <QueryClientProvider client={queryClient}>
-            <JotaiProvider>
+            <JotaiProvider store={roomStore}>
                 <RouterProvider router={router} />
             </JotaiProvider>
             ,

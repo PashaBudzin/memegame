@@ -1,5 +1,6 @@
 import type { User } from "@/stores/room";
-import { roomAtom, roomStore } from "@/stores/room";
+import { roomAtom } from "@/stores/room";
+import { roomStore } from "@/stores/store";
 
 export function addUser(user: User) {
     const newRoom = roomStore.get(roomAtom);
@@ -16,7 +17,7 @@ export function removeUser(userId: string, newOwnerId: string) {
 
     if (!newRoom) return;
 
-    newRoom.users = newRoom.users.filter((user) => user.id != userId);
+    newRoom.users = newRoom.users.filter((user: User) => user.id != userId);
 
     newRoom.ownerId = newOwnerId;
 
@@ -37,11 +38,7 @@ export function resetRoom() {
     roomStore.set(roomAtom, null);
 }
 
-export function createRoom(
-    ownerId: string,
-    roomId: string,
-    users: Array<User>,
-) {
+export function setRoom(ownerId: string, roomId: string, users: Array<User>) {
     const newRoom = {
         id: roomId,
         ownerId,

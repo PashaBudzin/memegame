@@ -39,8 +39,6 @@ func handleJoinRoomOperation(client *db.Client, message db.JSONMessage) (bool, e
 		return false, err
 	}
 
-	client.SendOk("join-room", nil)
-
 	userId := client.User.GetId()
 
 	type User struct {
@@ -49,20 +47,26 @@ func handleJoinRoomOperation(client *db.Client, message db.JSONMessage) (bool, e
 	}
 
 	type Room struct {
+		RoomId  string `json:"roomId"`
 		Users   []User `json:"users"`
 		OwnerId string `json:"ownerId"`
 	}
 
 	roomUsers := make([]User, len(room.Users))
 
-	for _, user := range room.Users {
-		roomUsers = append(roomUsers, User{
+	room.LockMutex()
+
+	for i, user := range room.Users {
+		roomUsers[i] = User{
 			Id:   user.GetId(),
 			Name: user.Name,
-		})
+		}
 	}
 
+	room.UnlockMutex()
+
 	roomData := Room{
+		RoomId:  room.GetId(),
 		Users:   roomUsers,
 		OwnerId: client.User.CurrentRoom().Owner_id,
 	}
@@ -73,6 +77,8 @@ func handleJoinRoomOperation(client *db.Client, message db.JSONMessage) (bool, e
 		Type: "user-joined",
 		Data: json.RawMessage(jsonBytes),
 	}, &userId)
+
+	client.SendOk("join-room", roomData)
 
 	return true, nil
 }

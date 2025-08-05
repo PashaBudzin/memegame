@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { config } from "@/config";
+import { setRoom } from "@/lib/room";
 
 const messageSchema = z.object({
     type: z.string().nonempty(),
@@ -127,7 +128,24 @@ export class WebsocketService {
     async joinRoom(roomId: string) {
         this.sendMessage("join-room", { roomId });
 
-        const result = this.waitForResult("join-room");
+        const result = await this.waitForResult("join-room");
+
+        console.log(result);
+
+        const resultSchema = z.object({
+            ownerId: z.string(),
+            roomId: z.string(),
+            users: z.array(
+                z.object({
+                    id: z.string(),
+                    name: z.string(),
+                }),
+            ),
+        });
+
+        const parsedResult = resultSchema.parse(result);
+
+        setRoom(parsedResult.ownerId, parsedResult.roomId, parsedResult.users);
 
         return result;
     }

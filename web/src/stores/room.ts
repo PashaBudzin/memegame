@@ -1,4 +1,4 @@
-import { atom, createStore } from "jotai";
+import { atom } from "jotai";
 
 export type User = {
     id: string;
@@ -18,4 +18,3 @@ export type Room = {
 };
 
 export const roomAtom = atom<Room | null>(null);
-export const roomStore = createStore();

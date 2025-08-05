@@ -30,15 +30,15 @@ func NewClient(conn *websocket.Conn) *Client {
 	clientsMutex.Lock()
 	defer clientsMutex.Unlock()
 
-	client := &Client{
+	client := Client{
 		ID:   uuid.NewString(),
 		Conn: conn,
 		User: nil,
 	}
 
-	clients[client.ID] = client
+	clients[client.ID] = &client
 
-	return client
+	return &client
 }
 
 func (c *Client) SendMessage(message JSONMessage) (bool, error) {

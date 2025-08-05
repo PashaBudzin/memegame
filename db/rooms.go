@@ -91,3 +91,11 @@ func (r *Room) BroadcastMessage(message JSONMessage, from_id *string) (bool, err
 	return true, nil
 
 }
+
+func (r *Room) LockMutex() {
+	r.roomMutex.Lock()
+}
+
+func (r *Room) UnlockMutex() {
+	r.roomMutex.Unlock()
+}

@@ -7,7 +7,6 @@ import (
 
 	"github.com/PashaBudzin/memegame/db"
 	"github.com/PashaBudzin/memegame/services"
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -27,11 +26,8 @@ func HandleWebsockets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clientID := uuid.New().String()
-	client := &db.Client{
-		ID:   clientID,
-		Conn: conn,
-	}
+	client := db.NewClient(conn)
+	clientID := client.ID
 
 	clients[clientID] = client
 
