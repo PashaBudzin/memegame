@@ -28,15 +28,11 @@ function Me() {
 
     async function createRoom() {
         try {
-            const roomId = await wss.createRoom();
-
-            if (!roomId) {
-                throw new Error("Failed to create room");
-            }
+            const room = await wss.createRoom();
 
             await navigate({
                 to: "/room/$roomId",
-                params: { roomId },
+                params: { roomId: room.roomId },
             });
         } catch (err) {
             console.error(err);
