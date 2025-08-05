@@ -38,17 +38,24 @@ func (r *Room) Delete() (bool, error) {
 	return true, nil
 }
 
-func CreateRoom(owner *User) *Room {
+func CreateRoom(owner *User) (*Room, error) {
+	owner.userMutex.Lock()
 	roomsMutex.Lock()
+
+	defer roomsMutex.Unlock()
+	defer owner.userMutex.Unlock()
+
+	if owner.CurrentRoom() != nil {
+		return nil, fmt.Errorf("user is already in a room")
+	}
+
 	room := Room{uuid.New().String(), []*User{owner}, owner.id, sync.Mutex{}}
 
 	rooms[room.id] = &room
 
 	owner.current_room_id = &room.id
 
-	roomsMutex.Unlock()
-
-	return &room
+	return &room, nil
 }
 
 func GetRoomById(id string) *Room {

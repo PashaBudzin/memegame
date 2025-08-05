@@ -9,7 +9,7 @@ import (
 func TestUser_LeaveRoom(t *testing.T) {
 	t.Run("deletes room if none users left", func(t *testing.T) {
 		user := db.CreateUser("test_user", "1")
-		room := db.CreateRoom(user)
+		room, _ := db.CreateRoom(user)
 
 		roomId := room.GetId()
 
@@ -24,7 +24,7 @@ func TestUser_LeaveRoom(t *testing.T) {
 		user1 := db.CreateUser("test_user", "1")
 		user2 := db.CreateUser("test_user", "1")
 
-		room := db.CreateRoom(user1)
+		room, _ := db.CreateRoom(user1)
 		user2.JoinRoom(room.GetId())
 
 		if len(room.Users) != 2 {

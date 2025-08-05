@@ -101,7 +101,11 @@ export class WebsocketService {
     async createRoom() {
         this.sendMessage("create-room", null);
 
-        await this.waitForResult("create-room");
+        const result = await this.waitForResult("create-room");
+
+        const resultSchema = z.string().nullable();
+
+        return resultSchema.parse(result);
     }
 
     async me() {

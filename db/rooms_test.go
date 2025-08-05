@@ -11,7 +11,7 @@ func TestCreateRoom(t *testing.T) {
 	t.Run("Creates room", func(t *testing.T) {
 		user := db.CreateUser("testuser", "1")
 
-		room := db.CreateRoom(user)
+		room, _ := db.CreateRoom(user)
 
 		fmt.Println(room.GetId())
 
@@ -25,7 +25,7 @@ func CanModifyRoom(t *testing.T) {
 	t.Run("Can modify users from room", func(t *testing.T) {
 		user := db.CreateUser("test", "1")
 
-		room := db.CreateRoom(user)
+		room, _ := db.CreateRoom(user)
 
 		user.Name = "test2"
 
@@ -38,7 +38,7 @@ func CanModifyRoom(t *testing.T) {
 func TestRoom_Delete(t *testing.T) {
 	t.Run("No room after deletion", func(t *testing.T) {
 		user := db.CreateUser("test_user", "1")
-		room := db.CreateRoom(user)
+		room, _ := db.CreateRoom(user)
 
 		roomId := room.GetId()
 
