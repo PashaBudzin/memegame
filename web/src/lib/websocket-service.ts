@@ -1,4 +1,10 @@
+import { z } from "zod";
 import { config } from "@/config";
+
+const messageSchema = z.object({
+    type: z.string().nonempty(),
+    data: z.any().nullish(),
+});
 
 export class WebsocketService {
     private ws: WebSocket;
@@ -28,28 +34,60 @@ export class WebsocketService {
     }
 
     handleOperationType(type: string, callback: (data: unknown) => void) {
-        this.ws.addEventListener("message", (msg) => {
-            let data: unknown;
+        const listener = (msg: Record<any, any>) => {
+            let jsonData: unknown;
 
             try {
-                data = JSON.parse(msg.data);
+                jsonData = JSON.parse(msg.data);
             } catch (err) {
                 console.error(err);
                 return;
             }
 
-            if (
-                typeof data === "object" &&
-                data != null &&
-                "type" in data &&
-                typeof data.type === "string" &&
-                "data" in data &&
-                data.type == type
-            ) {
-                callback(data.data);
-                return;
+            const parsed = messageSchema.safeParse(jsonData);
+
+            if (!parsed.success) {
+                console.error("data isn't of correct format", parsed);
             }
-            console.error("data isn't of correct format", data);
+
+            if (type != parsed.data?.type) return;
+
+            callback(parsed.data.data);
+        };
+
+        this.ws.addEventListener("message", listener);
+
+        return () => {
+            this.ws.removeEventListener("message", listener);
+        };
+    }
+
+    async waitForResult(type: string, timeout = 5000): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            setTimeout(() => reject("request timed out"), timeout);
+
+            const removeErrorListener = this.handleOperationType(
+                `error-${type}`,
+                (data: unknown) => {
+                    console.error(`Recieved error for type ${type}`, data);
+                    removeErrorListener();
+                    reject(data);
+                },
+            );
+
+            const removeOkListener = this.handleOperationType(
+                `ok-${type}`,
+                (_) => {
+                    removeOkListener();
+                    resolve();
+                },
+            );
         });
+    }
+
+    async attachUser(name: string) {
+        this.sendMessage("attach-user", { name });
+
+        await this.waitForResult("create-user");
     }
 }

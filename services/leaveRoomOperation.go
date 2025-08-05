@@ -6,7 +6,7 @@ import (
 	"github.com/PashaBudzin/memegame/db"
 )
 
-func handleLeaveRoomOpeartion(client db.Client, _ db.JSONMessage) (bool, error) {
+func handleLeaveRoomOpeartion(client *db.Client, _ db.JSONMessage) (bool, error) {
 	room := client.User.CurrentRoom()
 
 	if room == nil {

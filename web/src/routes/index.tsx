@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import Avatar from "@/components/avatar";
+import { useWebsocketService } from "@/stores/websockets";
 
 export const Route = createFileRoute("/")({
     component: App,
@@ -8,6 +9,20 @@ export const Route = createFileRoute("/")({
 
 function App() {
     const [name, setName] = useState("");
+
+    const wss = useWebsocketService();
+
+    const handleCreateRoom = (userName: string) => {
+        if (userName.length < 1) {
+            return;
+        }
+
+        wss.attachUser(userName)
+            .then((ok) => {
+                console.log("User was attached");
+            })
+            .catch((err) => console.error(err));
+    };
 
     return (
         <div className="glass absolute inset-0 m-20 mx-5 flex justify-center p-10 lg:mx-40">
@@ -29,6 +44,7 @@ function App() {
                     <button
                         className="glass glass-btn mx-auto mt-5 w-full p-1 px-2 lg:w-1/2"
                         disabled={!name}
+                        onClick={() => handleCreateRoom(name)}
                     >
                         Create room
                     </button>

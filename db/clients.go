@@ -3,6 +3,7 @@ package db
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"sync"
 
 	"github.com/google/uuid"
@@ -47,6 +48,8 @@ func (c *Client) SendMessage(message JSONMessage) (bool, error) {
 		return false, err
 	}
 
+	log.Println("sending message to client", c.ID, "with type", message.Type)
+
 	if err := c.Conn.WriteMessage(websocket.TextMessage, data); err != nil {
 		return false, err
 	}
@@ -54,25 +57,29 @@ func (c *Client) SendMessage(message JSONMessage) (bool, error) {
 	return true, nil
 }
 
-func (c *Client) SendOk() (bool, error) {
-	return c.SendMessage(JSONMessage{Type: "ok", Data: nil})
+func (c *Client) SendOk(reason string) (bool, error) {
+	return c.SendMessage(JSONMessage{Type: "ok-" + reason, Data: nil})
 }
 
-func (c *Client) SendError(message string) (bool, error) {
+func (c *Client) SendError(reason string, message string) (bool, error) {
 	msg, err := json.Marshal(message)
 
 	if err != nil {
 		return false, fmt.Errorf("failed to marshal error message")
 	}
 
-	return c.SendMessage(JSONMessage{Type: "error", Data: msg})
+	return c.SendMessage(JSONMessage{Type: "error-" + reason, Data: msg})
 }
 
-func (c *Client) AttachNewUser(name string) *User {
+func (c *Client) AttachNewUser(name string) (*User, error) {
+	if c.User != nil {
+		return nil, fmt.Errorf("client already has a user attached")
+	}
+
 	user := CreateUser(name, c.ID)
 	c.User = user
 
-	return user
+	return user, nil
 }
 
 func GetClientById(id string) *Client {

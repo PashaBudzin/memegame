@@ -73,11 +73,11 @@ func HandleWebsockets(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		_, err = services.HandleMessage(*client, msg)
+		_, err = services.HandleMessage(client, msg)
 
 		if err != nil {
 			log.Printf("error %v", err)
-			if _, err = client.SendError(err.Error()); err != nil {
+			if _, err = client.SendError("generic", err.Error()); err != nil {
 				log.Printf("failed to send error")
 			}
 		}

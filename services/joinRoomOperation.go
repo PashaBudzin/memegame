@@ -11,7 +11,7 @@ type joinRoomOperation struct {
 	RoomId string `json:"roomId"`
 }
 
-func handleJoinRoomOperation(client db.Client, message db.JSONMessage) (bool, error) {
+func handleJoinRoomOperation(client *db.Client, message db.JSONMessage) (bool, error) {
 	var data joinRoomOperation
 
 	err := json.Unmarshal(message.Data, &data)
@@ -36,7 +36,7 @@ func handleJoinRoomOperation(client db.Client, message db.JSONMessage) (bool, er
 		return false, err
 	}
 
-	client.SendOk()
+	client.SendOk("join-room")
 
 	return true, nil
 }

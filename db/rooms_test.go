@@ -9,7 +9,7 @@ import (
 
 func TestCreateRoom(t *testing.T) {
 	t.Run("Creates room", func(t *testing.T) {
-		user := db.CreateUser("testuser")
+		user := db.CreateUser("testuser", "1")
 
 		room := db.CreateRoom(user)
 
@@ -23,7 +23,7 @@ func TestCreateRoom(t *testing.T) {
 
 func CanModifyRoom(t *testing.T) {
 	t.Run("Can modify users from room", func(t *testing.T) {
-		user := db.CreateUser("test")
+		user := db.CreateUser("test", "1")
 
 		room := db.CreateRoom(user)
 
@@ -37,7 +37,7 @@ func CanModifyRoom(t *testing.T) {
 
 func TestRoom_Delete(t *testing.T) {
 	t.Run("No room after deletion", func(t *testing.T) {
-		user := db.CreateUser("test_user")
+		user := db.CreateUser("test_user", "1")
 		room := db.CreateRoom(user)
 
 		roomId := room.GetId()

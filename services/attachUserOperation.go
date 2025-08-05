@@ -11,7 +11,7 @@ type attachOperationData struct {
 	Name string `json:"name"`
 }
 
-func handleAttachUserOperation(client db.Client, message db.JSONMessage) (bool, error) {
+func handleAttachUserOperation(client *db.Client, message db.JSONMessage) (bool, error) {
 	var data attachOperationData
 
 	err := json.Unmarshal(message.Data, &data)
@@ -20,13 +20,15 @@ func handleAttachUserOperation(client db.Client, message db.JSONMessage) (bool, 
 		return false, fmt.Errorf("invalid json in data")
 	}
 
-	user := client.AttachNewUser(data.Name)
+	_, err = client.AttachNewUser(data.Name)
 
-	if user == nil {
+	if err != nil {
+		client.SendError("create-user", err.Error())
+
 		return false, fmt.Errorf("failed to attach user")
 	}
 
-	client.SendOk()
+	client.SendOk("create-user")
 
 	return true, nil
 }

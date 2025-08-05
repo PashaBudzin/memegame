@@ -6,7 +6,7 @@ import (
 	"github.com/PashaBudzin/memegame/db"
 )
 
-func HandleMessage(client db.Client, message db.JSONMessage) (bool, error) {
+func HandleMessage(client *db.Client, message db.JSONMessage) (bool, error) {
 	log.Printf("handling operation with type %s from user %s", message.Type, client.ID)
 
 	switch message.Type {
