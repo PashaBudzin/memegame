@@ -35,6 +35,8 @@ function App() {
             return;
         }
 
+        await wss.me();
+
         try {
             const result = await wss.joinRoom(search.roomId);
 
@@ -59,22 +61,37 @@ function App() {
                 <p className="mt-5 text-center text-xl font-semibold">
                     Select your name
                 </p>
-                <div className="flex w-full flex-col justify-center">
+                <form
+                    className="flex w-full flex-col justify-center"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+
+                        const input = (
+                            e.target as HTMLFormElement
+                        ).elements.namedItem("name") as HTMLInputElement | null;
+
+                        if (!input) return;
+
+                        handleCreateRoom(name);
+                    }}
+                    autoComplete="off"
+                >
                     <input
-                        name="lelik"
+                        name="name"
                         className="glass glass-input mx-auto mt-5 w-full p-1 px-2 lg:w-1/2"
                         placeholder="Your name"
+                        maxLength={20}
                         onChange={(e) => setName(e.target.value)}
                     />
                     <br />
                     <button
+                        type="submit"
                         className="glass glass-btn mx-auto mt-5 w-full p-1 px-2 lg:w-1/2"
                         disabled={!name}
-                        onClick={() => handleCreateRoom(name)}
                     >
                         {search.roomId ? "Join room" : "Continue"}
                     </button>
-                </div>
+                </form>
             </div>
         </div>
     );
