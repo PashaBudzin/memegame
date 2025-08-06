@@ -38,7 +38,6 @@ if (rootElement && !rootElement.innerHTML) {
             <JotaiProvider store={roomStore}>
                 <RouterProvider router={router} />
             </JotaiProvider>
-            ,
         </QueryClientProvider>,
     );
 }

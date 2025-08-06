@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { config } from "@/config";
-import { setRoom } from "@/lib/room";
+import { addChatMessage, setRoom, setUsers } from "@/lib/room";
+import { setSelf } from "@/stores/user";
 
 const messageSchema = z.object({
     type: z.string().nonempty(),
@@ -43,6 +44,8 @@ export class WebsocketService {
 
         this.instance = service;
 
+        service.handleOperations();
+
         return service;
     }
 
@@ -77,6 +80,32 @@ export class WebsocketService {
         return () => {
             this.ws.removeEventListener("message", listener);
         };
+    }
+
+    private handleOperations() {
+        this.handleOperationType("got-message", (data: unknown) => {
+            console.log("got-message", data);
+            const dataSchema = z.object({
+                from: z.string(),
+                message: z.string(),
+            });
+
+            const parsed = dataSchema.safeParse(data);
+
+            if (parsed.error)
+                return console.error("failed to parse message", parsed);
+
+            addChatMessage(parsed.data.from, parsed.data.message);
+        });
+
+        this.handleOperationType("user-joined", (data: unknown) => {
+            const parsed = roomSchema.safeParse(data);
+
+            if (parsed.error)
+                return console.error("failed to parse message", data);
+
+            setUsers(parsed.data.users);
+        });
     }
 
     async waitForResult(type: string, timeoutMs = 5000) {
@@ -135,7 +164,13 @@ export class WebsocketService {
             })
             .nullable();
 
-        return resultSchema.parse(result);
+        const me = resultSchema.parse(result);
+
+        if (me == null) return null;
+
+        setSelf({ id: me.id, name: me.name });
+
+        return me;
     }
 
     async joinRoom(roomId: string) {
@@ -150,6 +185,12 @@ export class WebsocketService {
         setRoom(parsedResult.ownerId, parsedResult.roomId, parsedResult.users);
 
         return result;
+    }
+
+    async sendChatMessage(message: string) {
+        this.sendMessage("chat-message", { message });
+
+        await this.waitForResult("chat-message");
     }
 }
 

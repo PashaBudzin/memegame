@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	"github.com/google/uuid"
@@ -80,8 +81,10 @@ func (r *Room) BroadcastMessage(message JSONMessage, from_id *string) (bool, err
 	r.roomMutex.Lock()
 	defer r.roomMutex.Unlock()
 
+	log.Printf("broadcasting message to %v from %v", message.Type, from_id)
+
 	for _, user := range r.Users {
-		if from_id == nil || *from_id == user.GetId() {
+		if from_id != nil && *from_id == user.GetId() {
 			continue
 		}
 
@@ -89,7 +92,6 @@ func (r *Room) BroadcastMessage(message JSONMessage, from_id *string) (bool, err
 	}
 
 	return true, nil
-
 }
 
 func (r *Room) LockMutex() {

@@ -29,6 +29,9 @@ func HandleMessage(client *db.Client, message db.JSONMessage) (bool, error) {
 	case "leave-room":
 		return handleLeaveRoomOpeartion(client, message)
 
+	case "chat-message":
+		return handleSendChatMessageOperation(client, message)
+
 	}
 
 	return false, nil

@@ -3,35 +3,39 @@ import { roomAtom } from "@/stores/room";
 import { roomStore } from "@/stores/store";
 
 export function addUser(user: User) {
-    const newRoom = roomStore.get(roomAtom);
+    roomStore.set(roomAtom, (newRoom) => {
+        if (!newRoom) {
+            return newRoom;
+        }
 
-    if (!newRoom) return;
+        return { ...newRoom, users: [...newRoom.users, user] };
+    });
+}
 
-    newRoom.users.push(user);
+export function setUsers(users: Array<User>) {
+    roomStore.set(roomAtom, (newRoom) => {
+        if (!newRoom) return newRoom;
 
-    roomStore.set(roomAtom, newRoom);
+        return { ...newRoom, users };
+    });
 }
 
 export function removeUser(userId: string, newOwnerId: string) {
-    const newRoom = roomStore.get(roomAtom);
+    roomStore.set(roomAtom, (newRoom) => {
+        if (!newRoom) return newRoom;
 
-    if (!newRoom) return;
+        const users = newRoom.users.filter((user: User) => user.id !== userId);
 
-    newRoom.users = newRoom.users.filter((user: User) => user.id != userId);
-
-    newRoom.ownerId = newOwnerId;
-
-    roomStore.set(roomAtom, newRoom);
+        return { ...newRoom, users, ownerId: newOwnerId };
+    });
 }
 
 export function addChatMessage(from: string, content: string) {
-    const newRoom = roomStore.get(roomAtom);
+    roomStore.set(roomAtom, (newRoom) => {
+        if (!newRoom) return null;
 
-    if (!newRoom) return;
-
-    newRoom.chat.push({ from, content });
-
-    roomStore.set(roomAtom, newRoom);
+        return { ...newRoom, chat: [...newRoom.chat, { from, content }] };
+    });
 }
 
 export function resetRoom() {
@@ -39,12 +43,12 @@ export function resetRoom() {
 }
 
 export function setRoom(ownerId: string, roomId: string, users: Array<User>) {
-    const newRoom = {
-        id: roomId,
-        ownerId,
-        users,
-        chat: [],
-    };
-
-    roomStore.set(roomAtom, newRoom);
+    roomStore.set(roomAtom, (_) => {
+        return {
+            id: roomId,
+            ownerId,
+            users,
+            chat: [],
+        };
+    });
 }
