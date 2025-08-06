@@ -6,12 +6,21 @@ import Avatar from "@/components/avatar";
 import { roomStore } from "@/stores/store";
 
 export const Route = createFileRoute("/room/$roomId")({
-    loader: () => {
+    loader: (p) => {
         const room = roomStore.get(roomAtom);
+
+        if (p.params.roomId != p.params.roomId) {
+            return redirect({
+                to: "/me",
+            });
+        }
 
         if (!room) {
             return redirect({
-                to: "/me",
+                to: "/",
+                search: {
+                    roomId: p.params.roomId,
+                },
             });
         }
     },

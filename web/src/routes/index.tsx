@@ -1,8 +1,11 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import z from "zod";
 import Avatar from "@/components/avatar";
 import { useWebsocketService } from "@/stores/websockets";
+import { selfAtom } from "@/stores/user";
+import { roomStore } from "@/stores/store";
+import { WebsocketService } from "@/lib/websocket-service";
 
 const searchParamsSchema = z.object({
     roomId: z.uuid().optional(),
@@ -10,6 +13,34 @@ const searchParamsSchema = z.object({
 
 export const Route = createFileRoute("/")({
     validateSearch: (search) => searchParamsSchema.parse(search),
+    loader: async ({ location }) => {
+        const me = roomStore.get(selfAtom);
+
+        const params = new URLSearchParams(location.search);
+        const roomId = params.get("roomId");
+        if (me == null) return;
+
+        if (roomId) {
+            try {
+                const wss = await WebsocketService.create();
+
+                wss.joinRoom(roomId);
+
+                return redirect({
+                    to: "/room/$roomId",
+                    params: {
+                        roomId,
+                    },
+                });
+            } catch (err) {
+                console.error("failed to join room");
+            }
+        }
+
+        return redirect({
+            to: "/me",
+        });
+    },
     component: App,
 });
 
