@@ -1,17 +1,24 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useAtom } from "jotai";
 import Chat from "@/components/chat";
 import { roomAtom } from "@/stores/room";
 import Avatar from "@/components/avatar";
-// import { useWebsocketService } from "@/stores/websockets";
+import { roomStore } from "@/stores/store";
 
 export const Route = createFileRoute("/room/$roomId")({
+    loader: () => {
+        const room = roomStore.get(roomAtom);
+
+        if (!room) {
+            return redirect({
+                to: "/me",
+            });
+        }
+    },
     component: Room,
 });
 
 function Room() {
-    // const wss = useWebsocketService();
-    //
     const [room] = useAtom(roomAtom);
 
     return (

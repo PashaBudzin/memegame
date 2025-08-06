@@ -30,17 +30,23 @@ function App() {
             await wss.attachUser(userName);
 
             if (!search.roomId) return await navigate({ to: "/me" });
+        } catch (err) {
+            console.error(err);
+            return;
+        }
 
+        try {
             const result = await wss.joinRoom(search.roomId);
 
             if (result) {
-                await navigate({
+                return await navigate({
                     to: "/room/$roomId",
                     params: { roomId: search.roomId },
                 });
             }
         } catch (err) {
             console.error(err);
+            return await navigate({ to: "/me" });
         }
     };
 
