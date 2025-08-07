@@ -2,6 +2,7 @@ import { z } from "zod";
 import { config } from "@/config";
 import { addChatMessage, removeUser, setRoom, setUsers } from "@/lib/room";
 import { setSelf } from "@/stores/user";
+import { chatMessageSchema, userSchema } from "@/stores/room";
 
 const messageSchema = z.object({
     type: z.string().nonempty(),
@@ -11,12 +12,7 @@ const messageSchema = z.object({
 const roomSchema = z.object({
     ownerId: z.string(),
     roomId: z.string(),
-    users: z.array(
-        z.object({
-            id: z.string(),
-            name: z.string(),
-        }),
-    ),
+    users: z.array(userSchema),
 });
 
 export class WebsocketService {
@@ -85,12 +81,8 @@ export class WebsocketService {
     private handleOperations() {
         this.handleOperationType("got-message", (data: unknown) => {
             console.log("got-message", data);
-            const dataSchema = z.object({
-                from: z.string(),
-                message: z.string(),
-            });
 
-            const parsed = dataSchema.safeParse(data);
+            const parsed = chatMessageSchema.safeParse(data);
 
             if (parsed.error)
                 return console.error("failed to parse message", parsed);
@@ -189,7 +181,7 @@ export class WebsocketService {
 
         if (me == null) return null;
 
-        setSelf({ id: me.id, name: me.name });
+        setSelf({ id: me.id, name: me.name, inactive: false });
 
         return me;
     }
