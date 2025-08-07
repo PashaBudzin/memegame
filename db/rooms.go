@@ -84,11 +84,16 @@ func (r *Room) BroadcastMessage(message JSONMessage, from_id *string) (bool, err
 	log.Printf("broadcasting message to %v from %v", message.Type, from_id)
 
 	for _, user := range r.Users {
+		log.Printf("broadcasting %s type to %s as part of broadcasting", message.Type, user.id)
 		if from_id != nil && *from_id == user.GetId() {
 			continue
 		}
 
-		user.GetClient().SendMessage(message)
+		_, err := user.GetClient().SendMessage(message)
+
+		if err != nil {
+			log.Println("failed to send message to client")
+		}
 	}
 
 	return true, nil

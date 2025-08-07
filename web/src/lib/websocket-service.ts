@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { config } from "@/config";
-import { addChatMessage, setRoom, setUsers } from "@/lib/room";
+import { addChatMessage, removeUser, setRoom, setUsers } from "@/lib/room";
 import { setSelf } from "@/stores/user";
 
 const messageSchema = z.object({
@@ -105,6 +105,27 @@ export class WebsocketService {
                 return console.error("failed to parse message", data);
 
             setUsers(parsed.data.users);
+        });
+
+        this.handleOperationType("user-left", (data: unknown) => {
+            // eslint-disable-next-line no-shadow
+            const messageSchema = z.object({
+                id: z.string(),
+                newOwnerId: z.string(),
+            });
+
+            console.log("user left", data);
+
+            const parsed = messageSchema.safeParse(data);
+
+            if (parsed.error)
+                return console.error(
+                    "failed to parse message",
+                    data,
+                    parsed.error,
+                );
+
+            removeUser(parsed.data.id, parsed.data.newOwnerId);
         });
     }
 

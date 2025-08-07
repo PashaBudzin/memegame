@@ -1,6 +1,7 @@
 package db
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 
@@ -98,6 +99,31 @@ func (u *User) LeaveRoom() error {
 	}
 
 	room.TransferRoomOwnership(any_user.id)
+
+	messageData := struct {
+		Id         string `json:"id"`
+		NewOwnerId string `json:"newOwnerId"`
+	}{
+		Id:         u.GetId(),
+		NewOwnerId: any_user.GetId(),
+	}
+
+	jsonBytes, err := json.Marshal(messageData)
+
+	if err != nil {
+		panic("failed to marshal struct")
+	}
+
+	message := JSONMessage{
+		Type: "user-left",
+		Data: json.RawMessage(jsonBytes),
+	}
+
+	room.UnlockMutex()
+
+	room.BroadcastMessage(message, &u.id)
+
+	room.LockMutex()
 
 	return nil
 }

@@ -16,8 +16,6 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var clients = make(map[string]*db.Client)
-
 func HandleWebsockets(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -29,16 +27,15 @@ func HandleWebsockets(w http.ResponseWriter, r *http.Request) {
 	client := db.NewClient(conn)
 	clientID := client.ID
 
-	clients[clientID] = client
-
 	defer func() {
 		conn.Close()
-		delete(clients, clientID)
+
+		log.Printf("connection with id %s disconnected", clientID)
 
 		if client.User != nil {
 			client.User.LeaveRoom()
 		}
-		log.Printf("connection with id %s disconnected", clientID)
+
 	}()
 
 	for {

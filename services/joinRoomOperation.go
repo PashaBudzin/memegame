@@ -17,6 +17,7 @@ func handleJoinRoomOperation(client *db.Client, message db.JSONMessage) (bool, e
 	err := json.Unmarshal(message.Data, &data)
 
 	if err != nil {
+		client.SendError("join-room", "invalid data")
 		return false, fmt.Errorf("invalid json in data")
 	}
 
