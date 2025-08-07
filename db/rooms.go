@@ -9,9 +9,9 @@ import (
 )
 
 type Room struct {
-	id        string
-	Users     []*User
-	OwnerId   string
+	Id        string  `json:"roomId"`
+	Users     []*User `json:"users"`
+	OwnerId   string  `json:"ownerId"`
 	roomMutex sync.Mutex
 }
 
@@ -21,7 +21,7 @@ var (
 )
 
 func (r *Room) GetId() string {
-	return r.id
+	return r.Id
 }
 
 func (r *Room) Delete() (bool, error) {
@@ -34,7 +34,7 @@ func (r *Room) Delete() (bool, error) {
 		u.userMutex.Unlock()
 	}
 
-	delete(rooms, r.id)
+	delete(rooms, r.Id)
 
 	return true, nil
 }
@@ -50,11 +50,11 @@ func CreateRoom(owner *User) (*Room, error) {
 		return nil, fmt.Errorf("user is already in a room")
 	}
 
-	room := Room{uuid.New().String(), []*User{owner}, owner.id, sync.Mutex{}}
+	room := Room{uuid.New().String(), []*User{owner}, owner.Id, sync.Mutex{}}
 
-	rooms[room.id] = &room
+	rooms[room.Id] = &room
 
-	owner.currentRoomId = &room.id
+	owner.currentRoomId = &room.Id
 
 	return &room, nil
 }
@@ -67,7 +67,7 @@ func GetRoomById(id string) *Room {
 
 func (r *Room) TransferRoomOwnership(userId string) (bool, error) {
 	for _, u := range r.Users {
-		if u.id == userId {
+		if u.Id == userId {
 			r.OwnerId = userId
 
 			return true, nil
@@ -84,7 +84,7 @@ func (r *Room) BroadcastMessage(message JSONMessage, from_id *string) (bool, err
 	log.Printf("broadcasting message to %v from %v", message.Type, from_id)
 
 	for _, user := range r.Users {
-		log.Printf("broadcasting %s type to %s as part of broadcasting", message.Type, user.id)
+		log.Printf("broadcasting %s type to %s as part of broadcasting", message.Type, user.Id)
 		if from_id != nil && *from_id == user.GetId() {
 			continue
 		}

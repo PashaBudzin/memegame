@@ -9,8 +9,9 @@ import (
 )
 
 type User struct {
-	id            string
-	Name          string
+	Id            string `json:"id"`
+	Name          string `json:"name"`
+	Inactive      bool   `json:"inactive"`
 	currentRoomId *string
 	clientId      string
 	userMutex     sync.Mutex
@@ -22,12 +23,12 @@ var (
 )
 
 func (u *User) GetId() string {
-	return u.id
+	return u.Id
 }
 
 func CreateUser(name string, client_id string) *User {
 	usersMutex.Lock()
-	user := User{Name: name, id: uuid.NewString(), clientId: client_id}
+	user := User{Name: name, Id: uuid.NewString(), clientId: client_id}
 
 	latestUserId += 1
 
@@ -50,14 +51,14 @@ func (u *User) JoinRoom(roomId string) error {
 	defer room.roomMutex.Unlock()
 
 	for _, user := range room.Users {
-		if user.id == u.id {
-			return fmt.Errorf("user with id %s is already in room %s", u.id, room.GetId())
+		if user.Id == u.Id {
+			return fmt.Errorf("user with id %s is already in room %s", u.Id, room.GetId())
 		}
 	}
 
 	room.Users = append(room.Users, u)
 
-	u.currentRoomId = &room.id
+	u.currentRoomId = &room.Id
 
 	return nil
 }
@@ -77,7 +78,7 @@ func (u *User) LeaveRoom() error {
 	defer room.roomMutex.Unlock()
 
 	for i, user := range room.Users {
-		if u.id == user.id {
+		if u.Id == user.Id {
 			room.Users = append(room.Users[:i], room.Users[i+1:]...)
 			break
 		}
@@ -98,7 +99,7 @@ func (u *User) LeaveRoom() error {
 		panic("expected room to have users left")
 	}
 
-	room.TransferRoomOwnership(any_user.id)
+	room.TransferRoomOwnership(any_user.Id)
 
 	messageData := struct {
 		Id         string `json:"id"`
@@ -121,7 +122,7 @@ func (u *User) LeaveRoom() error {
 
 	room.UnlockMutex()
 
-	room.BroadcastMessage(message, &u.id)
+	room.BroadcastMessage(message, &u.Id)
 
 	room.LockMutex()
 

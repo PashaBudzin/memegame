@@ -42,14 +42,14 @@ func handleJoinRoomOperation(client *db.Client, message db.JSONMessage) (bool, e
 
 	userId := client.User.GetId()
 
-	roomData, jsonBytes, err := client.User.CurrentRoom().RoomToJson()
+	jsonBytes, err := client.User.CurrentRoom().RoomToJson()
 
 	room.BroadcastMessage(db.JSONMessage{
 		Type: "user-joined",
 		Data: json.RawMessage(jsonBytes),
 	}, &userId)
 
-	client.SendOk("join-room", roomData)
+	client.SendOk("join-room", room)
 
 	return true, nil
 }
