@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useAtom } from "jotai";
+import { Crown } from "lucide-react";
 import Chat from "@/components/chat";
 import { roomAtom } from "@/stores/room";
 import Avatar from "@/components/avatar";
@@ -40,6 +41,11 @@ function Room() {
                             <Avatar seed={user.name} />
                         </div>
                         <p className="my-auto text-lg">{user.name}</p>
+                        {user.id == room.ownerId ? (
+                            <Crown className="mr-4 ml-auto h-full fill-yellow-500 stroke-yellow-500" />
+                        ) : (
+                            <></>
+                        )}
                     </div>
                 ))}
             </div>
