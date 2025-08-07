@@ -31,7 +31,7 @@ func (r *Room) RoomToJson() (JsonRoom, []byte, error) {
 	roomData := JsonRoom{
 		RoomId:  r.GetId(),
 		Users:   roomUsers,
-		OwnerId: r.Owner_id,
+		OwnerId: r.OwnerId,
 	}
 
 	jsonBytes, err := json.Marshal(roomData)

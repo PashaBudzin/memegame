@@ -9,11 +9,11 @@ import (
 )
 
 type User struct {
-	id              string
-	Name            string
-	current_room_id *string
-	client_id       string
-	userMutex       sync.Mutex
+	id            string
+	Name          string
+	currentRoomId *string
+	clientId      string
+	userMutex     sync.Mutex
 }
 
 var (
@@ -27,7 +27,7 @@ func (u *User) GetId() string {
 
 func CreateUser(name string, client_id string) *User {
 	usersMutex.Lock()
-	user := User{Name: name, id: uuid.NewString(), client_id: client_id}
+	user := User{Name: name, id: uuid.NewString(), clientId: client_id}
 
 	latestUserId += 1
 
@@ -57,7 +57,7 @@ func (u *User) JoinRoom(roomId string) error {
 
 	room.Users = append(room.Users, u)
 
-	u.current_room_id = &room.id
+	u.currentRoomId = &room.id
 
 	return nil
 }
@@ -66,7 +66,7 @@ func (u *User) LeaveRoom() error {
 	u.userMutex.Lock()
 	defer u.userMutex.Unlock()
 
-	room := GetRoomById(*u.current_room_id)
+	room := GetRoomById(*u.currentRoomId)
 
 	if room == nil {
 		return fmt.Errorf("user's room doesn't exist")
@@ -85,12 +85,12 @@ func (u *User) LeaveRoom() error {
 
 	if len(room.Users) == 0 {
 		room.Delete()
-		u.current_room_id = nil
+		u.currentRoomId = nil
 
 		return nil
 	}
 
-	u.current_room_id = nil
+	u.currentRoomId = nil
 
 	any_user := room.Users[0]
 
@@ -129,11 +129,11 @@ func (u *User) LeaveRoom() error {
 }
 
 func (u *User) CurrentRoom() *Room {
-	if u.current_room_id == nil {
+	if u.currentRoomId == nil {
 		return nil
 	}
 
-	room, ok := rooms[*u.current_room_id]
+	room, ok := rooms[*u.currentRoomId]
 
 	if !ok {
 		panic("user doesn't belong to room, but current_room_id isn't nil")
@@ -143,7 +143,7 @@ func (u *User) CurrentRoom() *Room {
 }
 
 func (u *User) GetClient() *Client {
-	client := GetClientById(u.client_id)
+	client := GetClientById(u.clientId)
 
 	if client == nil {
 		panic("no client attached")

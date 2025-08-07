@@ -11,7 +11,7 @@ import (
 type Room struct {
 	id        string
 	Users     []*User
-	Owner_id  string
+	OwnerId   string
 	roomMutex sync.Mutex
 }
 
@@ -30,7 +30,7 @@ func (r *Room) Delete() (bool, error) {
 
 	for _, u := range r.Users {
 		u.userMutex.Lock()
-		u.current_room_id = nil
+		u.currentRoomId = nil
 		u.userMutex.Unlock()
 	}
 
@@ -54,7 +54,7 @@ func CreateRoom(owner *User) (*Room, error) {
 
 	rooms[room.id] = &room
 
-	owner.current_room_id = &room.id
+	owner.currentRoomId = &room.id
 
 	return &room, nil
 }
@@ -68,7 +68,7 @@ func GetRoomById(id string) *Room {
 func (r *Room) TransferRoomOwnership(userId string) (bool, error) {
 	for _, u := range r.Users {
 		if u.id == userId {
-			r.Owner_id = userId
+			r.OwnerId = userId
 
 			return true, nil
 		}
