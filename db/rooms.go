@@ -106,3 +106,15 @@ func (r *Room) LockMutex() {
 func (r *Room) UnlockMutex() {
 	r.roomMutex.Unlock()
 }
+
+func (r *Room) ClearInactiveUsers() {
+	r.roomMutex.Lock()
+
+	defer r.roomMutex.Unlock()
+
+	for _, u := range r.Users {
+		if u.Inactive {
+			u.LeaveRoom()
+		}
+	}
+}
