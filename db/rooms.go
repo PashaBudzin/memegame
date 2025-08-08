@@ -145,6 +145,11 @@ func (r *Room) StartGame(rounds []*Round) (bool, error) {
 
 	time.Sleep(time.Second * 3)
 
+	r.BroadcastMessage(JSONMessage{
+		Type: "game-started",
+		Data: nil,
+	}, nil)
+
 	for i, round := range r.Rounds {
 		message := struct {
 			LengthSeconds int64     `json:"lengthSeconds"`

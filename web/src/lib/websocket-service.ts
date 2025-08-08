@@ -2,7 +2,9 @@ import { z } from "zod";
 import { config } from "@/config";
 import { addChatMessage, removeUser, setRoom, setUsers } from "@/lib/room";
 import { setSelf } from "@/stores/user";
-import { chatMessageSchema, userSchema } from "@/stores/room";
+import { chatMessageSchema, roomAtom, userSchema } from "@/stores/room";
+import { roomStore } from "@/stores/store";
+import { gameStateAtom, roundAtom, roundSchema } from "@/stores/game";
 
 const messageSchema = z.object({
     type: z.string().nonempty(),
@@ -118,6 +120,37 @@ export class WebsocketService {
                 );
 
             removeUser(parsed.data.id, parsed.data.newOwnerId);
+        });
+
+        this.handleOperationType("game-starts-in-3", (_) => {
+            roomStore.set(gameStateAtom, {
+                started: false,
+                startingIn: true,
+            });
+        });
+
+        this.handleOperationType("game-started", (_) => {
+            roomStore.set(gameStateAtom, {
+                started: true,
+                startingIn: false,
+            });
+        });
+
+        this.handleOperationType("game-ended", (_) => {
+            roomStore.set(gameStateAtom, {
+                started: false,
+                startingIn: false,
+            });
+
+            roomStore.set(roundAtom, null);
+        });
+
+        this.handleOperationType("start-round", (data) => {
+            const parsed = roundSchema.safeParse(data);
+
+            if (parsed.error) return console.error("failed to parse game");
+
+            roomStore.set(roundAtom, parsed.data);
         });
     }
 
