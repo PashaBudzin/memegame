@@ -34,16 +34,6 @@ func (rt RoundType) String() string {
 
 type Round struct {
 	Type          RoundType             `json:"type"`
-	LengthSeconds int                   `json:"lengthSeconds"`
+	LengthSeconds int64                 `json:"lengthSeconds"`
 	Submissions   map[string]Submission `json:"submissions"`
-}
-
-func (r *Round) SetSubmission(s Submission, fromUserId string) (bool, error) {
-	if s.GetType() != r.Type.String() {
-		return false, fmt.Errorf("submission type doesn't match round type")
-	}
-
-	r.Submissions[fromUserId] = s
-
-	return true, nil
 }

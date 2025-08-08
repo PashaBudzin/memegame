@@ -1,9 +1,11 @@
 package db
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -12,8 +14,8 @@ type Room struct {
 	Id                 string  `json:"roomId"`
 	Users              []*User `json:"users"`
 	OwnerId            string  `json:"ownerId"`
-	CurrentRoundNumber *int
-	Rounds             *[]Round
+	CurrentRoundNumber int
+	Rounds             []*Round
 	roomMutex          sync.Mutex
 }
 
@@ -56,7 +58,7 @@ func CreateRoom(owner *User) (*Room, error) {
 		uuid.New().String(),
 		[]*User{owner},
 		owner.Id,
-		nil,
+		0,
 		nil,
 		sync.Mutex{},
 	}
@@ -126,4 +128,54 @@ func (r *Room) ClearInactiveUsers() {
 			u.LeaveRoom()
 		}
 	}
+}
+
+func (r *Room) StartGame(rounds []*Round) (bool, error) {
+	if r.Rounds != nil {
+		return false, fmt.Errorf("there is game already")
+	}
+
+	r.Rounds = rounds
+	r.CurrentRoundNumber = 0
+
+	r.BroadcastMessage(JSONMessage{
+		Type: "round-starts-in-3",
+		Data: nil,
+	}, nil)
+
+	time.Sleep(time.Second * 3)
+
+	for i, round := range r.Rounds {
+		message := struct {
+			LengthSeconds int64     `json:"lengthSeconds"`
+			Type          RoundType `json:"type"`
+		}{
+			LengthSeconds: round.LengthSeconds,
+			Type:          round.Type,
+		}
+
+		messageBytes, err := json.Marshal(message)
+
+		if err != nil {
+			panic("failed to marshal json")
+		}
+
+		r.BroadcastMessage(JSONMessage{
+			Type: "start-round",
+			Data: json.RawMessage(messageBytes),
+		}, nil)
+
+		r.CurrentRoundNumber = i
+		time.Sleep(time.Second * time.Duration(round.LengthSeconds))
+	}
+
+	r.BroadcastMessage(JSONMessage{
+		Type: "game-ended",
+		Data: nil,
+	}, nil)
+
+	r.CurrentRoundNumber = 0
+	r.Rounds = nil
+
+	return true, nil
 }

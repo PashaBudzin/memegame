@@ -205,6 +205,12 @@ export class WebsocketService {
 
         await this.waitForResult("chat-message");
     }
+
+    async startGame(type: string, roundModifier: number) {
+        this.sendMessage("start-game", { gameType: type, roundModifier });
+
+        await this.waitForResult("start-game");
+    }
 }
 
 declare global {
@@ -215,4 +221,9 @@ declare global {
 
 if (import.meta.env.DEV) {
     window.wss = await WebsocketService.create();
+
+    // @ts-ignore ignore private modifier
+    window.wss.ws.addEventListener("message", (msg) =>
+        console.log("[WSS DEBUG]", msg),
+    );
 }

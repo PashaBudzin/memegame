@@ -152,3 +152,32 @@ func (u *User) GetClient() *Client {
 
 	return client
 }
+
+func (u *User) AttachSubmission(submission Submission) (bool, error) {
+	room := u.CurrentRoom()
+
+	if room == nil {
+		return false, fmt.Errorf("user is not in a room")
+	}
+
+	if room.Rounds == nil {
+		return false, fmt.Errorf("there is no game in current room")
+	}
+
+	currentRound := room.Rounds[room.CurrentRoundNumber]
+
+	if currentRound == nil {
+		return false, fmt.Errorf("error current round is invalid")
+	}
+
+	if currentRound.Type != submission.GetType() {
+		return false, fmt.Errorf(
+			"submission of type %s is invalid in round of type %s",
+			submission.GetType(), currentRound.Type,
+		)
+	}
+
+	currentRound.Submissions[u.Id] = submission
+
+	return true, nil
+}

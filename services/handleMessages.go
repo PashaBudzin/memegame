@@ -32,6 +32,10 @@ func HandleMessage(client *db.Client, message db.JSONMessage) (bool, error) {
 	case "chat-message":
 		return handleSendChatMessageOperation(client, message)
 
+	case "start-game":
+		return handleStartGameOpearation(client, message)
+	case "attach-submission":
+		return handleAttachSubmissionOperation(client, message)
 	}
 
 	return false, nil

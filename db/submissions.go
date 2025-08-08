@@ -1,7 +1,7 @@
 package db
 
 type Submission interface {
-	GetType() string
+	GetType() RoundType
 }
 
 type TextSubmission struct {
