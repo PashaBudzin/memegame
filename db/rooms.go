@@ -9,10 +9,12 @@ import (
 )
 
 type Room struct {
-	Id        string  `json:"roomId"`
-	Users     []*User `json:"users"`
-	OwnerId   string  `json:"ownerId"`
-	roomMutex sync.Mutex
+	Id                 string  `json:"roomId"`
+	Users              []*User `json:"users"`
+	OwnerId            string  `json:"ownerId"`
+	CurrentRoundNumber *int
+	Rounds             *[]Round
+	roomMutex          sync.Mutex
 }
 
 var (
@@ -50,7 +52,14 @@ func CreateRoom(owner *User) (*Room, error) {
 		return nil, fmt.Errorf("user is already in a room")
 	}
 
-	room := Room{uuid.New().String(), []*User{owner}, owner.Id, sync.Mutex{}}
+	room := Room{
+		uuid.New().String(),
+		[]*User{owner},
+		owner.Id,
+		nil,
+		nil,
+		sync.Mutex{},
+	}
 
 	rooms[room.Id] = &room
 
