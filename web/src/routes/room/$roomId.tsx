@@ -5,6 +5,7 @@ import Chat from "@/components/chat";
 import { roomAtom } from "@/stores/room";
 import Avatar from "@/components/avatar";
 import { roomStore } from "@/stores/store";
+import GamemodeSelector from "@/components/gamemode-selector";
 
 export const Route = createFileRoute("/room/$roomId")({
     loader: (p) => {
@@ -49,7 +50,13 @@ function Room() {
                     </div>
                 ))}
             </div>
-            <div className="col-span-4">Col span 2</div>
+            <div className="col-span-4 flex flex-col">
+                <p className="font-xl p-2 pt-5 text-center text-xl">
+                    Select round type
+                </p>
+
+                <GamemodeSelector />
+            </div>
 
             <div className="glassy-border col-span-2 flex flex-col border-l border-white/30 px-2 pt-5 pb-2">
                 <p className="text-center text-xl">Chat</p>

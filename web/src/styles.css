@@ -37,6 +37,7 @@ code {
     -webkit-backdrop-filter: blur(11px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     transition: all 0.25s;
+    transition-timing-function: ease-in;
     color: white;
 
     text-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
@@ -51,7 +52,7 @@ code {
 }
 
 .glass-btn:disabled {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(100, 100, 100, 0.05);
 }
 
 .glass-input:focus {
