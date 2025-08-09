@@ -2,7 +2,7 @@ import { z } from "zod";
 import { config } from "@/config";
 import { addChatMessage, removeUser, setRoom, setUsers } from "@/lib/room";
 import { setSelf } from "@/stores/user";
-import { chatMessageSchema, roomAtom, userSchema } from "@/stores/room";
+import { chatMessageSchema, userSchema } from "@/stores/room";
 import { roomStore } from "@/stores/store";
 import { gameStateAtom, roundAtom, roundSchema } from "@/stores/game";
 

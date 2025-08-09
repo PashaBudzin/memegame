@@ -6,6 +6,8 @@ import { roomAtom } from "@/stores/room";
 import Avatar from "@/components/avatar";
 import { roomStore } from "@/stores/store";
 import GamemodeSelector from "@/components/gamemode-selector";
+import { gameStateAtom } from "@/stores/game";
+import Game from "@/components/game";
 
 export const Route = createFileRoute("/room/$roomId")({
     loader: (p) => {
@@ -31,6 +33,9 @@ export const Route = createFileRoute("/room/$roomId")({
 
 function Room() {
     const [room] = useAtom(roomAtom);
+    const [gameState] = useAtom(gameStateAtom);
+
+    if (gameState?.started) return <Game />;
 
     return (
         <div className="glass absolute inset-0 m-20 mx-5 grid grid-cols-8 justify-center lg:mx-40">
