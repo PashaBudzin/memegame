@@ -48,7 +48,7 @@ func startClassicGame(client *db.Client, roundCountModifier int) (bool, error) {
 }
 
 func startTestGame(client *db.Client, _ int) (bool, error) {
-	game := []*db.Round{{Type: "text", LengthSeconds: 100}}
+	game := []*db.Round{{Type: "text", LengthSeconds: 100, Submissions: map[string]db.Submission{}}}
 
 	ok, err := client.User.CurrentRoom().StartGame(game)
 

@@ -4,7 +4,13 @@ import { addChatMessage, removeUser, setRoom, setUsers } from "@/lib/room";
 import { setSelf } from "@/stores/user";
 import { chatMessageSchema, userSchema } from "@/stores/room";
 import { roomStore } from "@/stores/store";
-import { gameStateAtom, roundAtom, roundSchema } from "@/stores/game";
+import {
+    gameStateAtom,
+    roundAtom,
+    roundSchema,
+    type RoundType,
+    type Submission,
+} from "@/stores/game";
 
 const messageSchema = z.object({
     type: z.string().nonempty(),
@@ -243,6 +249,12 @@ export class WebsocketService {
         this.sendMessage("start-game", { gameType: type, roundModifier });
 
         await this.waitForResult("start-game");
+    }
+
+    async attachSubmission(submission: Submission) {
+        this.sendMessage("attach-submission", submission);
+
+        await this.waitForResult("attach-submission");
     }
 }
 

@@ -160,14 +160,10 @@ func (u *User) AttachSubmission(submission Submission) (bool, error) {
 		return false, fmt.Errorf("user is not in a room")
 	}
 
-	if room.Rounds == nil {
-		return false, fmt.Errorf("there is no game in current room")
-	}
+	currentRound, err := room.GetCurrentRound()
 
-	currentRound := room.Rounds[room.CurrentRoundNumber]
-
-	if currentRound == nil {
-		return false, fmt.Errorf("error current round is invalid")
+	if err != nil {
+		return false, err
 	}
 
 	if currentRound.Type != submission.GetType() {

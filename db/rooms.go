@@ -150,37 +150,57 @@ func (r *Room) StartGame(rounds []*Round) (bool, error) {
 		Data: nil,
 	}, nil)
 
-	for i, round := range r.Rounds {
-		message := struct {
-			LengthSeconds int64     `json:"lengthSeconds"`
-			Type          RoundType `json:"type"`
-		}{
-			LengthSeconds: round.LengthSeconds,
-			Type:          round.Type,
-		}
+	go func() {
+		for i, round := range r.Rounds {
+			message := struct {
+				LengthSeconds int64     `json:"lengthSeconds"`
+				Type          RoundType `json:"type"`
+			}{
+				LengthSeconds: round.LengthSeconds,
+				Type:          round.Type,
+			}
 
-		messageBytes, err := json.Marshal(message)
+			messageBytes, err := json.Marshal(message)
 
-		if err != nil {
-			panic("failed to marshal json")
+			if err != nil {
+				panic("failed to marshal json")
+			}
+
+			r.BroadcastMessage(JSONMessage{
+				Type: "start-round",
+				Data: json.RawMessage(messageBytes),
+			}, nil)
+
+			r.CurrentRoundNumber = i
+			time.Sleep(time.Second * time.Duration(round.LengthSeconds))
 		}
 
 		r.BroadcastMessage(JSONMessage{
-			Type: "start-round",
-			Data: json.RawMessage(messageBytes),
+			Type: "game-ended",
+			Data: nil,
 		}, nil)
 
-		r.CurrentRoundNumber = i
-		time.Sleep(time.Second * time.Duration(round.LengthSeconds))
-	}
-
-	r.BroadcastMessage(JSONMessage{
-		Type: "game-ended",
-		Data: nil,
-	}, nil)
-
-	r.CurrentRoundNumber = 0
-	r.Rounds = nil
+		r.CurrentRoundNumber = 0
+		r.Rounds = nil
+	}()
 
 	return true, nil
+}
+
+func (r *Room) GetCurrentRound() (*Round, error) {
+	if r.CurrentRoundNumber >= len(r.Rounds) {
+		panic("current round is out of bounds ( > len(r.Rounds) )")
+	}
+
+	if r.CurrentRoundNumber < 0 {
+		panic("current round is out of bounds ( < 0 )")
+	}
+
+	if r.Rounds == nil {
+		return nil, fmt.Errorf("there is no round currently")
+	}
+
+	round := r.Rounds[r.CurrentRoundNumber]
+
+	return round, nil
 }

@@ -24,24 +24,26 @@ func handleAttachSubmissionOperation(client *db.Client, message db.JSONMessage) 
 
 	switch attachOperation.Type {
 	case "text":
-		_, err := handleTextSubmission(client, attachOperation.Data)
+		ok, err := handleTextSubmission(client, attachOperation.Data)
 
 		if err != nil {
 			client.SendError("attach-submission", err.Error())
+		} else {
+			client.SendOk("attach-submission", nil)
 		}
+
+		return ok, err
 
 	default:
 		client.SendError("attach-submission", "invalid attachment type")
 		return false, fmt.Errorf("invalid attachment type")
 	}
-
-	panic("unreachable")
 }
 
 func handleTextSubmission(client *db.Client, data json.RawMessage) (bool, error) {
 	var content string
 
-	err := json.Unmarshal(data, content)
+	err := json.Unmarshal(data, &content)
 
 	if err != nil {
 		return false, fmt.Errorf("failed to unmarshal data")
@@ -49,7 +51,5 @@ func handleTextSubmission(client *db.Client, data json.RawMessage) (bool, error)
 
 	submission := db.TextSubmission{Text: content}
 
-	client.User.AttachSubmission(submission)
-
-	return true, nil
+	return client.User.AttachSubmission(submission)
 }

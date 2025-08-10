@@ -10,6 +10,13 @@ export const roundSchema = z.object({
     lengthSeconds: z.number().nonnegative(),
 });
 
+export const submissionSchema = z.object({
+    type: roundTypeSchema,
+    data: z.union([z.string()]),
+});
+
+export type Submission = z.infer<typeof submissionSchema>;
+
 export type Round = z.infer<typeof roundSchema>;
 
 export type GameState = {
