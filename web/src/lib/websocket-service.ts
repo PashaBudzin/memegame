@@ -1,16 +1,11 @@
 import { z } from "zod";
+import type { Submission } from "@/stores/game";
 import { config } from "@/config";
 import { addChatMessage, removeUser, setRoom, setUsers } from "@/lib/room";
 import { setSelf } from "@/stores/user";
 import { chatMessageSchema, userSchema } from "@/stores/room";
 import { roomStore } from "@/stores/store";
-import {
-    gameStateAtom,
-    roundAtom,
-    roundSchema,
-    type RoundType,
-    type Submission,
-} from "@/stores/game";
+import { gameStateAtom, roundAtom, roundSchema } from "@/stores/game";
 
 const messageSchema = z.object({
     type: z.string().nonempty(),
@@ -132,6 +127,7 @@ export class WebsocketService {
             roomStore.set(gameStateAtom, {
                 started: false,
                 startingIn: true,
+                presentation: false,
             });
         });
 
@@ -139,6 +135,7 @@ export class WebsocketService {
             roomStore.set(gameStateAtom, {
                 started: true,
                 startingIn: false,
+                presentation: false,
             });
         });
 
@@ -146,6 +143,7 @@ export class WebsocketService {
             roomStore.set(gameStateAtom, {
                 started: false,
                 startingIn: false,
+                presentation: false,
             });
 
             roomStore.set(roundAtom, null);
@@ -157,6 +155,25 @@ export class WebsocketService {
             if (parsed.error) return console.error("failed to parse game");
 
             roomStore.set(roundAtom, parsed.data);
+        });
+
+        this.handleOperationType("start-presentation", (_) => {
+            roomStore.set(gameStateAtom, {
+                started: true,
+                startingIn: false,
+                presentation: true,
+            });
+        });
+
+        this.handleOperationType("end-presentation", (_) => {
+            roomStore.set(gameStateAtom, (p) => {
+                if (!p) return p;
+
+                return {
+                    ...p,
+                    presentation: false,
+                };
+            });
         });
     }
 

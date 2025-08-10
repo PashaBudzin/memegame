@@ -175,6 +175,8 @@ func (r *Room) StartGame(rounds []*Round) (bool, error) {
 			time.Sleep(time.Second * time.Duration(round.LengthSeconds))
 		}
 
+		r.StartPresentation()
+
 		r.BroadcastMessage(JSONMessage{
 			Type: "game-ended",
 			Data: nil,
@@ -183,6 +185,34 @@ func (r *Room) StartGame(rounds []*Round) (bool, error) {
 		r.CurrentRoundNumber = 0
 		r.Rounds = nil
 	}()
+
+	return true, nil
+}
+
+func (r *Room) StartPresentation() (bool, error) {
+	r.BroadcastMessage(JSONMessage{
+		Type: "start-presentation",
+		Data: nil,
+	}, nil)
+
+	for _, round := range r.Rounds {
+		messageBytes, err := json.Marshal(round)
+
+		if err != nil {
+			return false, err
+		}
+
+		_, err = r.BroadcastMessage(JSONMessage{
+			Type: "present-submission",
+			Data: json.RawMessage(messageBytes),
+		}, nil)
+
+		if err != nil {
+			return false, err
+		}
+
+		time.Sleep(10 * time.Second)
+	}
 
 	return true, nil
 }

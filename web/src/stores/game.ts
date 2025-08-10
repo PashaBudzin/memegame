@@ -22,6 +22,7 @@ export type Round = z.infer<typeof roundSchema>;
 export type GameState = {
     started: boolean;
     startingIn: boolean;
+    presentation: boolean;
 };
 
 export const roundAtom = atom<Round | null>(null);
