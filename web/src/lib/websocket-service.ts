@@ -124,27 +124,15 @@ export class WebsocketService {
         });
 
         this.handleOperationType("game-starts-in-3", (_) => {
-            roomStore.set(gameStateAtom, {
-                started: false,
-                startingIn: true,
-                presentation: false,
-            });
+            roomStore.set(gameStateAtom, "starting");
         });
 
         this.handleOperationType("game-started", (_) => {
-            roomStore.set(gameStateAtom, {
-                started: true,
-                startingIn: false,
-                presentation: false,
-            });
+            roomStore.set(gameStateAtom, "started");
         });
 
         this.handleOperationType("game-ended", (_) => {
-            roomStore.set(gameStateAtom, {
-                started: false,
-                startingIn: false,
-                presentation: false,
-            });
+            roomStore.set(gameStateAtom, "no-game");
 
             roomStore.set(roundAtom, null);
         });
@@ -158,22 +146,11 @@ export class WebsocketService {
         });
 
         this.handleOperationType("start-presentation", (_) => {
-            roomStore.set(gameStateAtom, {
-                started: true,
-                startingIn: false,
-                presentation: true,
-            });
+            roomStore.set(gameStateAtom, "presentation");
         });
 
         this.handleOperationType("end-presentation", (_) => {
-            roomStore.set(gameStateAtom, (p) => {
-                if (!p) return p;
-
-                return {
-                    ...p,
-                    presentation: false,
-                };
-            });
+            roomStore.set(gameStateAtom, "no-game");
         });
     }
 

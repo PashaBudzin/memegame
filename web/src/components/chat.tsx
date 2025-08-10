@@ -62,7 +62,7 @@ export default function Chat() {
                                     ?.name ?? ""}
                             </p>
                         </div>
-                        <p className="mb-2">{msg.content}</p>
+                        <p className="mb-2">{msg.message}</p>
                     </div>
                 ))}
                 <div ref={ref}></div>

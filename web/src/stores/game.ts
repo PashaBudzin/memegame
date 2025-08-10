@@ -19,11 +19,7 @@ export type Submission = z.infer<typeof submissionSchema>;
 
 export type Round = z.infer<typeof roundSchema>;
 
-export type GameState = {
-    started: boolean;
-    startingIn: boolean;
-    presentation: boolean;
-};
+export type GameState = "starting" | "started" | "presentation" | "no-game";
 
 export const roundAtom = atom<Round | null>(null);
-export const gameStateAtom = atom<GameState | null>(null);
+export const gameStateAtom = atom<GameState>("no-game");

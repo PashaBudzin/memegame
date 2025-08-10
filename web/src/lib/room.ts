@@ -30,11 +30,11 @@ export function removeUser(userId: string, newOwnerId: string) {
     });
 }
 
-export function addChatMessage(from: string, content: string) {
+export function addChatMessage(from: string, message: string) {
     roomStore.set(roomAtom, (newRoom) => {
         if (!newRoom) return null;
 
-        return { ...newRoom, chat: [...newRoom.chat, { from, content }] };
+        return { ...newRoom, chat: [...newRoom.chat, { from, message }] };
     });
 }
 
