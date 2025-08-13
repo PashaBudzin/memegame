@@ -1,7 +1,11 @@
 import { useAtomDevtools, useAtomsDebugValue } from "jotai-devtools";
 import { roomAtom } from "@/stores/room";
 import { selfAtom } from "@/stores/user";
-import { gameStateAtom, roundAtom } from "@/stores/game";
+import {
+    gameStateAtom,
+    roundAtom,
+    submissionPresentationAtom,
+} from "@/stores/game";
 
 export default function Devtools() {
     if (import.meta.env.PROD) return <></>;
@@ -12,6 +16,7 @@ export default function Devtools() {
     useAtomDevtools(selfAtom, { name: "Self" });
     useAtomDevtools(roundAtom, { name: "Round" });
     useAtomDevtools(gameStateAtom, { name: "Game State" });
+    useAtomDevtools(submissionPresentationAtom, { name: "Submissions" });
 
     return null;
 }

@@ -5,7 +5,8 @@ type Submission interface {
 }
 
 type TextSubmission struct {
-	Text string `json:"text"`
+	Type string `json:"type"`
+	Data string `json:"data"`
 }
 
 func (_ TextSubmission) GetType() RoundType {

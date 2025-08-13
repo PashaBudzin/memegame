@@ -49,7 +49,7 @@ func handleTextSubmission(client *db.Client, data json.RawMessage) (bool, error)
 		return false, fmt.Errorf("failed to unmarshal data")
 	}
 
-	submission := db.TextSubmission{Text: content}
+	submission := db.TextSubmission{Data: content, Type: "text"}
 
 	return client.User.AttachSubmission(submission)
 }

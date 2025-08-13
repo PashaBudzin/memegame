@@ -211,8 +211,13 @@ func (r *Room) StartPresentation() (bool, error) {
 			return false, err
 		}
 
-		time.Sleep(10 * time.Second)
+		time.Sleep(1000 * time.Second) // TODO: wait for host to present
 	}
+
+	r.BroadcastMessage(JSONMessage{
+		Type: "end-presentation",
+		Data: nil,
+	}, nil)
 
 	return true, nil
 }

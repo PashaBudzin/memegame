@@ -5,7 +5,14 @@ import { addChatMessage, removeUser, setRoom, setUsers } from "@/lib/room";
 import { setSelf } from "@/stores/user";
 import { chatMessageSchema, userSchema } from "@/stores/room";
 import { roomStore } from "@/stores/store";
-import { gameStateAtom, roundAtom, roundSchema } from "@/stores/game";
+import {
+    gameStateAtom,
+    roundAtom,
+    roundSchema,
+    roundTypeSchema,
+    submissionPresentationAtom,
+    submissionsRecordSchema,
+} from "@/stores/game";
 
 const messageSchema = z.object({
     type: z.string().nonempty(),
@@ -151,6 +158,20 @@ export class WebsocketService {
 
         this.handleOperationType("end-presentation", (_) => {
             roomStore.set(gameStateAtom, "no-game");
+        });
+
+        this.handleOperationType("present-submission", (data) => {
+            const presentSubmissionSchema = z.object({
+                lengthSeconds: z.number(),
+                submissions: submissionsRecordSchema,
+                type: roundTypeSchema,
+            });
+
+            const parsed = presentSubmissionSchema.parse(data);
+
+            roomStore.set(submissionPresentationAtom, {
+                ...parsed.submissions,
+            });
         });
     }
 
